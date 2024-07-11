@@ -2,3 +2,5 @@ build/
 build_em/
 build.sh
 build_ts.sh
+.vscode/
+
