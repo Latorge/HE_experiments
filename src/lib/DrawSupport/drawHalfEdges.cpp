@@ -40,10 +40,10 @@ namespace DrawSupport {
 
 
     std::vector<DrawSupport::PointInfo> setHalgEdgesLines2(HalfedgeDS& halfedgeDS) {
-        const float arrowSize = 0.015f;
+        const float arrowSize = 0.035f;
         const float crossGapFactor = 0.03f;
         const float dirGapFactor = 0.15f;
-        const float normalGapFactor = 0.01f;
+        const float normalGapFactor = 0.03f;
 
         Color linesColor;
         linesColor.setHex(0xFFFFFF);  // White color for lines

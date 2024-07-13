@@ -51,6 +51,7 @@ namespace Operations {
         }
 
         // Find a boundary halfedge different from out->twin and in 
+        /*
         Halfedge* g = nullptr; 
         auto loop = halfOut->vertex->collectFreeHalfedges();  // Assuming this returns some iterable
         for (auto he : loop) {
@@ -59,7 +60,8 @@ namespace Operations {
                 break;
             }
         }
-
+        */
+       Halfedge* g=halfOut->vertex->findBoundaryHalfedge(halfIn, halfOut);
         if (!g) {
             return false;
         }

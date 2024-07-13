@@ -77,11 +77,11 @@ glm::vec3 Halfedge::closestPointOnLine(const glm::vec3& a, const glm::vec3& b, c
     return a + ab * glm::max(0.f, glm::min(1.f, t));  // Clamping t to the segment
 }
 
-
+/*
 
 FreeHalfedgeIterator::FreeHalfedgeIterator(std::vector<Halfedge*>::iterator start, std::vector<Halfedge*>::iterator end)
     : current(start), end(end) {
-    while (current != end && !(*current)->isFree()) {
+    while (current != end && !(*current)->twin->isFree()) {
         ++current;
     }
 }
@@ -91,11 +91,11 @@ bool FreeHalfedgeIterator::hasNext() const {
 }
 
 Halfedge* FreeHalfedgeIterator::next() {
-    if (current == end) return nullptr;
+    if (current == end || !*end || !*current) return nullptr;
     Halfedge* result = *current;
     do {
         ++current;
-    } while (current != end && !(*current)->isFree());
+    } while (current != end && !(*current)->twin->isFree());
     return result;
 }
-
+*/

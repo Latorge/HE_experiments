@@ -22,7 +22,12 @@ namespace Operations {
         }
 
         if (!v1->isFree() || !v2->isFree()) {
-            throw std::invalid_argument("Vertices v1 and v2 are not free");
+            Halfedge* currentHalfEdge = v1->getHalfedgeToVertex(v2);
+            if (currentHalfEdge) {
+                return currentHalfEdge;
+            }
+            // Handle the error case where no connecting half-edge is found
+            throw std::runtime_error("Vertices v1 and v2 are not free or not connected by a halfedge.");
         }
 
         // Create new halfedges
@@ -51,9 +56,9 @@ namespace Operations {
             */
 
         // Update refs around v1 if not isolated
-        Halfedge* in1 = v1->freeHalfedgesInLoopIter().next(); // Custom function to find a free halfedge
+        Halfedge* in1 = v1->freeHalfedgesInLoopNext(nullptr);// Custom function to find a free halfedge
         if (in1) {
-            Halfedge* out1 = in1->next->next;
+            Halfedge* out1 = in1->next;
             h1->prev = in1;
             in1->next = h1;
 
@@ -64,7 +69,7 @@ namespace Operations {
         }
 
         // Update refs around v2 if not isolated
-        Halfedge* in2 = v2->freeHalfedgesInLoopIter().next();
+        Halfedge* in2 = v2->freeHalfedgesInLoopNext(nullptr);//->freeHalfedgesInLoopIter().next();
         if (in2) {
             Halfedge* out2 = in2->next;
             h2->prev = in2;

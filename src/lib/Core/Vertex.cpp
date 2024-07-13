@@ -25,45 +25,64 @@ void Vertex::move(const glm::vec3& vector) {
     position += vector;
 }
 
-std::vector<Halfedge*> Vertex::collectFreeHalfedges() {
-    std::vector<Halfedge*> freeHalfedges;
-    for (auto he : loopCW()) {
-        if (he->isFree()) {
-            freeHalfedges.push_back(he);
+std::vector<Halfedge*> Vertex::freeHalfedgesInLoop(Halfedge* start = nullptr) {
+        std::vector<Halfedge*> freeHalfedges;
+        for (auto it =  beginCW(start); it != endCW(); ++it) {
+            if ((*it).twin && (*it).twin->isFree()) {
+                freeHalfedges.push_back((*it).twin);
+            }
         }
-    }
     return freeHalfedges;
 }
 
-Halfedge* Vertex::freeHalfedgesInLoop() {
-    for (auto he : loopCW()) {
-        if (he->isFree()) {
-            return he;
+Halfedge* Vertex::freeHalfedgesInLoopNext(Halfedge* start) {
+    if (!start) start = this->halfedge; // Use the vertex's halfedge if no start is provided
+
+    int count = 0;  // Counter to find the second free halfedge
+
+    // Iterate over the halfedges in a clockwise direction
+    for (auto it =  beginCW(start); it != endCW(); ++it) {
+        // Check if the twin of the current halfedge exists and is free
+        if ((*it).twin && (*it).twin->isFree()) {
+            count++;
+            if (count == 2) {
+                return (*it).twin; // Return the second free halfedge if found
+            }
         }
     }
-    return nullptr;
+
+    return nullptr; // Return nullptr if less than two free halfedges exist
 }
 
-FreeHalfedgeIterator Vertex::freeHalfedgesInLoopIter() {
-        return FreeHalfedgeIterator(loopCW().begin(), loopCW().end());
-}
 
-std::vector<Halfedge*> Vertex::collectBoundaryHalfedges() {
-    std::vector<Halfedge*> boundaryHalfedges;
-    for (auto he : loopCW()) {
-        if (he->isBoundary()) {
-            boundaryHalfedges.push_back(he);
+Halfedge* Vertex::findBoundaryHalfedge(Halfedge* halfIn, Halfedge* halfOut) {
+    Halfedge* g = nullptr;
+
+    // Start iteration from the halfedge outwards, assuming halfOut->vertex points to the starting vertex
+    auto it = halfOut->vertex->beginCW(halfOut);
+    while (it.hasNext()) {
+        Halfedge* he = it.next();
+        
+        // Check if this halfedge is free and is not the input halfedge
+        if (he->isFree() && he != halfIn) {
+            g = he;
+            break;
         }
+
+        // Make sure to not infinitely loop; stop if we come back to the starting point
+        if (he == halfOut) break;
     }
-    return boundaryHalfedges;
+
+    return g;
 }
 
+// Check if the vertex is free (any of its halfedges has no face)
 bool Vertex::isFree() {
     if (isIsolated()) {
         return true;
     }
-    for (auto he : loopCW()) {
-        if (he->isFree()) {
+    for (CWIterator it = beginCW(); it != endCW(); ++it) {
+        if ((*it).isFree()) {
             return true;
         }
     }
@@ -91,7 +110,7 @@ bool Vertex::matchesPosition(const glm::vec3& pos, float tolerance = 1e-10) {
 
 Halfedge* Vertex::getHalfedgeToVertex(Vertex* other) {
     for (auto he : loopCW()) {
-        if (he->twin->vertex == other) {
+        if (halfedge->twin && halfedge->twin->vertex == other) {
             return he;
         }
     }
@@ -138,4 +157,63 @@ glm::vec3 Vertex::calculateVertexNormal() {
 float Vertex::calculateAngleWeight(Face* face, const glm::vec3& faceNormal, size_t numCommonVertices) {
     glm::vec3 vertexToFaceCenter = face->calculateCenterPoint() - position;
     return std::acos(glm::dot(faceNormal, vertexToFaceCenter) / (glm::length(faceNormal) * glm::length(vertexToFaceCenter))) / numCommonVertices;
+}
+
+ // Prefix increment
+Vertex::CWIterator& Vertex::CWIterator::operator++() {
+    if (current && current->twin) {
+        current = current->twin->next;
+        if (current == start) {
+            if (!firstPass) {
+                current = nullptr;  // End the iteration
+            }
+            firstPass = false;
+        }
+    }
+    return *this;
+}
+
+// Postfix increment
+Vertex::CWIterator Vertex::CWIterator::operator++(int) {
+    CWIterator tmp = *this;
+    ++(*this);
+    return tmp;
+}
+
+bool Vertex::CWIterator::hasNext() const {
+    return current != nullptr && (firstPass || current != start);
+}
+
+Halfedge* Vertex::CWIterator::next() {
+    if (!hasNext()) return nullptr;
+    Halfedge* result = current;
+    operator++();  // Move the iterator forward
+    return result;
+}
+
+void Vertex::CWIterator::reset() {
+    current = start;
+    firstPass = true;
+}
+
+
+ // Prefix decrement
+Vertex::CCWIterator& Vertex::CCWIterator::operator--() {
+    if (current && current->prev && current->prev->twin) {
+        current = current->prev->twin;
+        if (current == start) {
+            if (!firstPass) {
+                current = nullptr; // End the iteration
+            }
+            firstPass = false;
+        }
+    }
+    return *this;
+}
+
+// Postfix decrement
+Vertex::CCWIterator Vertex::CCWIterator::operator--(int) {
+    CCWIterator tmp = *this;
+    --(*this);
+    return tmp;
 }

@@ -56,13 +56,13 @@ public:
     }
 
     // Accessor methods
-    Vertex* getVertex(int index) const { return vertices[index]; }
+    Vertex*   getVertex(int index) const { return vertices[index]; }
     Halfedge* getHalfedge(int index) const { return halfedges[index]; }
-    Face* getFace(int index) const { return faces[index]; }
+    Face*     getFace(int index) const { return faces[index]; }
 
-    const std::vector<Vertex*>& getVertices() const { return vertices; }
+    const std::vector<Vertex*>&   getVertices() const { return vertices; }
     const std::vector<Halfedge*>& getHalfedges() const { return halfedges; }
-    const std::vector<Face*>& getFaces() const { return faces; }
+    const std::vector<Face*>&     getFaces() const { return faces; }
 
     // Method to get the next face ID without incrementing the counter
     int getNextFaceID() const {
@@ -73,8 +73,6 @@ public:
 
     std::vector<std::vector<Halfedge *>> loops();
     std::vector<std::vector<Halfedge *>> loopsExp();
-
-
 
     // Destructor to properly clean up memory
     ~HalfedgeDS() {

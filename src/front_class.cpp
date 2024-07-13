@@ -7,12 +7,13 @@ namespace HalfedgeLib {
     {
 
         //auto protoCube=Operations::generateQuadArraysCube(3,3,3,1.0);
-        auto protoCube=Operations::generateQuadArrays(1,1,3.0);
-
+        auto protoCube=Operations::generateQuadArrays(2,2,1.0);
+/*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
 
         }
+        */
         auto protoCubeUniqVertex=Operations::computeUniquePositionsArray(protoCube.positions,protoCube.cells);
 
          for (auto& pos : protoCubeUniqVertex.positions) {
@@ -53,7 +54,7 @@ namespace HalfedgeLib {
             resultList.push_back(DrawSupport::PointInfo2);
         }
         */
-        resultList=DrawSupport::setHalgEdgesLines(halfedgeDS01);
+        resultList=DrawSupport::setHalgEdgesLines2(halfedgeDS01);
         return resultList;
     }
 }

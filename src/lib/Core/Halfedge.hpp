@@ -72,6 +72,10 @@ public:
         friend bool operator!=(const Iterator& a, const Iterator& b) { return a.ptr != b.ptr; }
     };
 
+
+    bool operator==(const Halfedge& other) const { return this == &other; }
+    bool operator!=(const Halfedge& other) const { return this != &other; }
+
     Iterator begin() { return Iterator(this); }
     Iterator end() { return Iterator(); }
 
@@ -80,7 +84,7 @@ private:
 };
 
 
-
+/*
 class FreeHalfedgeIterator {
 private:
     std::vector<Halfedge*>::iterator current;
@@ -93,7 +97,7 @@ public:
     // Get the next free halfedge
     Halfedge* next() ;
 };
-
+*/
 
 
 
