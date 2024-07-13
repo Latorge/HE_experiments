@@ -3,10 +3,7 @@
 
 #include <iostream>
 #include <vector>
-#include <cmath>
-#include <memory>
 #include <glm/glm.hpp>
-#include <set>
 #include "Struct.hpp"
 
 class Vertex {
@@ -28,6 +25,7 @@ public:
     std::vector<Halfedge*> collectFreeHalfedges() ;
     Halfedge *freeHalfedgesInLoop();
     std::vector<Halfedge *> collectBoundaryHalfedges();
+    
     bool isFree() ;
     bool isIsolated();
 
@@ -38,6 +36,9 @@ public:
     bool isConnectedToVertex(Vertex* other);
     std::vector<Halfedge*> loopCW() ;
    // glm::vec3 calculateVertexNormal() ;
+
+    FreeHalfedgeIterator freeHalfedgesInLoopIter();
+
 private:
     float calculateAngleWeight(Face* face, const glm::vec3& faceNormal, size_t numCommonVertices) ;
 };

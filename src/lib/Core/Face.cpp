@@ -2,9 +2,8 @@
 
 Face::Face(Halfedge*  _he, int _id)  : halfedge(_he), id(_id), normalFlag(false) {}
 
-glm::vec3 Face::getNormal() {
-    if (!normalFlag) {
-
+glm::vec3 Face::getNormal(bool useNormalFlag) {
+    if (!normalFlag && useNormalFlag) {
         auto prevPos = halfedge->prev->vertex->position;
         auto currentPos = halfedge->vertex->position;
         auto nextPos = halfedge->next->vertex->position;
@@ -12,6 +11,15 @@ glm::vec3 Face::getNormal() {
         normalFlag = true;
     }
     return normal;
+}
+
+void Face::calculateNormal()
+{
+    auto prevPos = halfedge->prev->vertex->position;
+    auto currentPos = halfedge->vertex->position;
+    auto nextPos = halfedge->next->vertex->position;
+    normal = glm::normalize(glm::cross(nextPos - currentPos, prevPos - currentPos));
+    normalFlag = true;
 }
 
 glm::vec3 Face::calculateCenterPoint() {

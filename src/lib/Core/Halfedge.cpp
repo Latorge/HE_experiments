@@ -1,6 +1,12 @@
 #include "Halfedge.hpp"
 
-Halfedge::Halfedge(Vertex* vertex, int _id) : vertex(vertex), id(_id) {}
+Halfedge::Halfedge(Vertex* vertex, int _id) : vertex(vertex), id(_id) {
+    // Initialize all pointers to nullptr to avoid undefined behavior
+        face = nullptr;
+        twin = nullptr;
+        prev = nullptr;
+        next = nullptr;
+}
 
 
 std::string Halfedge::getId() const {
@@ -49,6 +55,18 @@ void Halfedge::forEachHalfedgeCCW(const std::function<void(Halfedge*)>& action) 
     } while (current != start);
 }
 
+ // Generate a vector of all halfedges in this loop
+std::vector<Halfedge*> Halfedge::nextLoop() {
+    std::vector<Halfedge*> loop;
+    Halfedge* start = this;
+    do {
+        loop.push_back(start);
+        start->visited = true;
+        start = start->next;
+    } while (start != this && start != nullptr);
+    return loop;
+}
+
 
 glm::vec3 Halfedge::closestPointOnLine(const glm::vec3& a, const glm::vec3& b, const glm::vec3& p) {
     glm::vec3 ap = p - a;
@@ -58,3 +76,26 @@ glm::vec3 Halfedge::closestPointOnLine(const glm::vec3& a, const glm::vec3& b, c
     float t = ap_ab / ab2;
     return a + ab * glm::max(0.f, glm::min(1.f, t));  // Clamping t to the segment
 }
+
+
+
+FreeHalfedgeIterator::FreeHalfedgeIterator(std::vector<Halfedge*>::iterator start, std::vector<Halfedge*>::iterator end)
+    : current(start), end(end) {
+    while (current != end && !(*current)->isFree()) {
+        ++current;
+    }
+}
+
+bool FreeHalfedgeIterator::hasNext() const {
+    return current != end;
+}
+
+Halfedge* FreeHalfedgeIterator::next() {
+    if (current == end) return nullptr;
+    Halfedge* result = *current;
+    do {
+        ++current;
+    } while (current != end && !(*current)->isFree());
+    return result;
+}
+

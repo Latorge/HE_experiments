@@ -1,9 +1,17 @@
 #include "Vertex.hpp"
 
 
-Vertex::Vertex(int& _id) : position(glm::vec3(0.0, 0.0, 0.0)), id(_id) {}
-Vertex::Vertex(float x, float y, float z, int& _id) : position(glm::vec3(x, y, z)), id(_id) {}
-Vertex::Vertex(glm::vec3 vec, int& _id) : position(vec), id(_id) {}
+Vertex::Vertex(int& _id) : position(glm::vec3(0.0, 0.0, 0.0)), id(_id) {
+     halfedge  =   nullptr;
+}
+
+Vertex::Vertex(float x, float y, float z, int& _id) : position(glm::vec3(x, y, z)), id(_id){
+    halfedge  =   nullptr;
+}
+
+Vertex::Vertex(glm::vec3 vec, int& _id) : position(vec), id(_id){
+    halfedge  =   nullptr;
+}
 
 void Vertex::changeComponent(float x, float y, float z) {
     position = glm::vec3(x, y, z);
@@ -34,6 +42,10 @@ Halfedge* Vertex::freeHalfedgesInLoop() {
         }
     }
     return nullptr;
+}
+
+FreeHalfedgeIterator Vertex::freeHalfedgesInLoopIter() {
+        return FreeHalfedgeIterator(loopCW().begin(), loopCW().end());
 }
 
 std::vector<Halfedge*> Vertex::collectBoundaryHalfedges() {

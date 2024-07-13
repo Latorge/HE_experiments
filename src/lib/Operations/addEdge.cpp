@@ -51,9 +51,9 @@ namespace Operations {
             */
 
         // Update refs around v1 if not isolated
-        Halfedge* in1 = v1->freeHalfedgesInLoop()->next; // Custom function to find a free halfedge
+        Halfedge* in1 = v1->freeHalfedgesInLoopIter().next(); // Custom function to find a free halfedge
         if (in1) {
-            Halfedge* out1 = in1->next;
+            Halfedge* out1 = in1->next->next;
             h1->prev = in1;
             in1->next = h1;
 
@@ -64,7 +64,7 @@ namespace Operations {
         }
 
         // Update refs around v2 if not isolated
-        Halfedge* in2 = v2->freeHalfedgesInLoop()->next;
+        Halfedge* in2 = v2->freeHalfedgesInLoopIter().next();
         if (in2) {
             Halfedge* out2 = in2->next;
             h2->prev = in2;

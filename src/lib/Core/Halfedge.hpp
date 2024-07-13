@@ -4,9 +4,9 @@
 #include <iostream>
 #include <functional>
 #include <optional>
-#include <glm/glm.hpp>
 #include "Struct.hpp"
 #include "Geometry.hpp"
+
 
 class Halfedge {
 public:
@@ -35,7 +35,9 @@ public:
 
     void forEachHalfedgeCW(const std::function<void(Halfedge*)>& action);
 
-    void forEachHalfedgeCCW(const std::function<void(Halfedge*)>& action) ;
+    void forEachHalfedgeCCW(const std::function<void(Halfedge*)>& action);
+
+    std::vector<Halfedge *> nextLoop();
 
     class Iterator {
     private:
@@ -79,4 +81,22 @@ private:
 
 
 
+class FreeHalfedgeIterator {
+private:
+    std::vector<Halfedge*>::iterator current;
+    std::vector<Halfedge*>::iterator end;
+
+public:
+    FreeHalfedgeIterator(std::vector<Halfedge*>::iterator start, std::vector<Halfedge*>::iterator end);
+    // Check if there are more free halfedges
+    bool hasNext() const ;
+    // Get the next free halfedge
+    Halfedge* next() ;
+};
+
+
+
+
 #endif // HALFEDGE_HPP
+
+
