@@ -40,14 +40,15 @@ namespace HalfedgeLib {
 
         auto faceExp=halfedgeDS01.getFaces()[7];
         Operations::removeFace(halfedgeDS01,faceExp);
-        auto faceExp2=halfedgeDS01.getFaces()[7];
-        Operations::removeFace(halfedgeDS01,faceExp2);
-        auto faceExp3=halfedgeDS01.getFaces()[7];
-        Operations::removeFace(halfedgeDS01,faceExp3);
+        auto faceExp=halfedgeDS01.getFaces()[7];
+        Operations::removeFace(halfedgeDS01,faceExp);
+        auto faceExp=halfedgeDS01.getFaces()[7];
+        Operations::removeFace(halfedgeDS01,faceExp);
 
         std::cout<<"HEDS number faces: "<<halfedgeDS01.getFaces().size()<<std::endl;
         std::cout<<"HEDS number vertex: "<<halfedgeDS01.getVertices().size()<<std::endl;
         std::cout<<"HEDS number halfEdges: "<<halfedgeDS01.getHalfedges().size()<<std::endl;
+
 
        // auto v1=Operations::addVertex( halfedgeDS, glm::vec3(0,0,0),true);
        // auto v2=Operations::addVertex( halfedgeDS, glm::vec3(1,0,0),true);
