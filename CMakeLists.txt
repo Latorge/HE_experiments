@@ -82,14 +82,29 @@ include_directories(${glm_DIR})
 set(include_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/lib)
 include_directories(${include_DIR})
 
+
+SET(DrawSupport_INC
+    src/lib/DrawSupport/drawSupport.hpp
+)
+SET(DrawSupport_SRC
+    src/lib/DrawSupport/drawHalfEdges.cpp
+
+)
+
 SET(Operations_INC
     src/lib/Operations/Operations.hpp
+    src/lib/Operations/createOperations.hpp
 
 )
 SET(Operations_SRC
     src/lib/Operations/addFace.cpp
     src/lib/Operations/addVertex.cpp
     src/lib/Operations/addEdge.cpp
+    src/lib/Operations/setFromGeometry.cpp
+    src/lib/Operations/cubeCreater.cpp
+    src/lib/Operations/planeCreater.cpp
+    src/lib/Operations/removeEdge.cpp
+    src/lib/Operations/removeFace.cpp
 )
 
 SET(main_INC
@@ -120,6 +135,7 @@ SET(main_SRC
 
 add_library(${MODULE_NAME} STATIC
         ${Operations_INC} ${Operations_SRC}
+        ${DrawSupport_INC} ${DrawSupport_SRC}
         ${main_INC} ${main_SRC}
         ${main_SRC_ext}
 )

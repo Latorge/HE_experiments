@@ -3,13 +3,12 @@
 
 #include <vector>
 #include <memory>
-#include <glm/glm.hpp>
 #include "Struct.hpp"
 
 class Face {
 public:
-    Halfedge* halfedge;
-    Face* parentFace;
+    Halfedge* halfedge  =   nullptr;
+    Face* parentFace    =   nullptr;
     glm::vec3 normal;
     bool normalFlag = false;
     glm::vec3 direction;
@@ -32,7 +31,8 @@ public:
 
     Face(Halfedge* he, int _id) ;
 
-    glm::vec3 getNormal() ;
+    glm::vec3 getNormal(bool useNormalFlag=false);
+    void calculateNormal();
 
     glm::vec3 calculateCenterPoint() ;
 
@@ -42,6 +42,10 @@ public:
 
     Vertex* vertexFromPosition(const glm::vec3& position, float tolerance) ;
     bool hasVertex(Vertex* vertex);
+    std::vector<Vertex *> getVertices();
+    std::vector<Halfedge *> getHalfedges();
+    std::vector<Vertex *> commonVerticesWithVertex(Vertex *vertex);
+    bool isNormalCalculated() const;
     // Additional methods would be translated similarly
 };
 

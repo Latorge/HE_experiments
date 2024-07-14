@@ -1,11 +1,12 @@
 #include "Operations.hpp"
 
 namespace Operations {
+    
     Vertex* addVertex(
         HalfedgeDS& structDS,
         const glm::vec3& position,
-        bool checkDuplicates = false,
-        float tolerance = 1e-10) {
+        bool checkDuplicates,
+        float tolerance ) {
 
         if (checkDuplicates) {
             for (auto& vertex : structDS.getVertices()) {
@@ -14,7 +15,7 @@ namespace Operations {
                 }
             }
         }
-        auto v=structDS.addVertex(position);
+        auto v=structDS.addVertexDirect(position);
         v->subGroup = -1;
         return v;
     }

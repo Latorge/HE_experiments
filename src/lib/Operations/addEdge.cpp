@@ -22,7 +22,12 @@ namespace Operations {
         }
 
         if (!v1->isFree() || !v2->isFree()) {
-            throw std::invalid_argument("Vertices v1 and v2 are not free");
+            Halfedge* currentHalfEdge = v1->getHalfedgeToVertex(v2);
+            if (currentHalfEdge) {
+                return currentHalfEdge;
+            }
+            // Handle the error case where no connecting half-edge is found
+            throw std::runtime_error("Vertices v1 and v2 are not free or not connected by a halfedge.");
         }
 
         // Create new halfedges
@@ -51,11 +56,18 @@ namespace Operations {
             */
 
         // Update refs around v1 if not isolated
-        Halfedge* in1 = v1->freeHalfedgesInLoop()->next; // Custom function to find a free halfedge
+
+        //HalfedgeGenerator gen1(v1);
+        //auto in1 = gen1.next();
+
+        Halfedge* in1 = v1->freeHalfedgesInLoopNext(nullptr);// Custom function to find a free halfedge
         if (in1) {
-            Halfedge* out1 = in1->next;
-            h1->prev = in1;
-            in1->next = h1;
+            //auto in1he=*in1;
+            auto in1he=in1;
+            //std::cout<<in1he->getId()<<std::endl;
+            Halfedge* out1 = in1he->next;
+            h1->prev = in1he;
+            in1he->next = h1;
 
             h2->next = out1;
             out1->prev = h2;
@@ -64,22 +76,71 @@ namespace Operations {
         }
 
         // Update refs around v2 if not isolated
-        Halfedge* in2 = v2->freeHalfedgesInLoop()->next;
+        //HalfedgeGenerator gen2(v2);
+        //auto in2 = gen2.next();
+
+        Halfedge* in2 = v2->freeHalfedgesInLoopNext(nullptr);//->freeHalfedgesInLoopIter().next();
         if (in2) {
-            Halfedge* out2 = in2->next;
-            h2->prev = in2;
-            in2->next = h2;
+            //auto in2he=*in2;
+            auto in2he=in2;
+            //std::cout<<in2he->getId()<<std::endl;
+            Halfedge* out2 = in2he->next;
+            h2->prev = in2he;
+            in2he->next = h2;
 
             h1->next = out2;
             out2->prev = h1;
         } else {
             v2->halfedge = h2; // Update v2's halfedge if it was isolated
         }
-
+        //std::cout<<h1->getId()<<std::endl;
+        //std::cout<<h2->getId()<<std::endl;
+        //std::cout<<"------"<<std::endl;
         structDS.addHalfedge(h1);
         structDS.addHalfedge(h2);
 
         return h1;
+    }
+
+
+/*
+Vertex* v; // Assume this is properly initialized
+HalfedgeGenerator gen(v);
+
+auto he = gen.next();
+while (he) {
+    Halfedge* freeHalfedge = *he;
+    // Process freeHalfedge
+
+    he = gen.next(); // Move to the next free halfedge
+}
+*/
+    HalfedgeGenerator::HalfedgeGenerator(Vertex* v, Halfedge* s)
+        : vertex(v), start(s ? s : v->halfedge), current(s ? s : v->halfedge), firstCall(true) {}
+
+    std::optional<Halfedge*> HalfedgeGenerator::next() {
+        if (!current || !start) return std::nullopt;  // Handle cases where there is no starting halfedge
+
+        if (!firstCall) {
+            current = current->twin->next;
+        }
+
+        if (current == start && !firstCall) {
+            return std::nullopt; // Completed a full loop
+        }
+
+        firstCall = false;
+
+        if (current->twin && current->twin->isFree()) {
+            return {current->twin};
+        }
+
+        return next(); // Continue to the next valid halfedge if the current one isn't free
+    }
+
+    void HalfedgeGenerator::reset() {
+        current = start;
+        firstCall = true;
     }
 
 }
