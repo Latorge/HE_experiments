@@ -57,8 +57,6 @@ namespace Operations {
 
         // Update refs around v1 if not isolated
 
-        std::cout<<"------"<<std::endl;
-
         //HalfedgeGenerator gen1(v1);
         //auto in1 = gen1.next();
 
@@ -66,7 +64,7 @@ namespace Operations {
         if (in1) {
             //auto in1he=*in1;
             auto in1he=in1;
-            std::cout<<in1he->getId()<<std::endl;
+            //std::cout<<in1he->getId()<<std::endl;
             Halfedge* out1 = in1he->next;
             h1->prev = in1he;
             in1he->next = h1;
@@ -85,7 +83,7 @@ namespace Operations {
         if (in2) {
             //auto in2he=*in2;
             auto in2he=in2;
-            std::cout<<in2he->getId()<<std::endl;
+            //std::cout<<in2he->getId()<<std::endl;
             Halfedge* out2 = in2he->next;
             h2->prev = in2he;
             in2he->next = h2;
@@ -97,7 +95,7 @@ namespace Operations {
         }
         //std::cout<<h1->getId()<<std::endl;
         //std::cout<<h2->getId()<<std::endl;
-        std::cout<<"------"<<std::endl;
+        //std::cout<<"------"<<std::endl;
         structDS.addHalfedge(h1);
         structDS.addHalfedge(h2);
 

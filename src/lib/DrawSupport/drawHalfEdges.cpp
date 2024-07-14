@@ -79,11 +79,20 @@ namespace DrawSupport {
 
 
                 glm::vec3 pos = start + normal + cross + dir;
-                glm::vec3 tip = end + normal + cross - dir;
+                glm::vec3 tip = end   + normal + cross - dir;
 
-                 if(he->isBoundary()) {
+                if(he->isBoundary()) {
                     pos = start + normal - cross + dir;
-                    tip = end + normal - cross - dir;
+                    tip = end   + normal - cross - dir;
+                }
+
+                if(he->isBoundary() || he->twin->isBoundary()) {
+                    vertices.push_back({start, randomColor.color});
+                    vertices.push_back({end,   randomColor.color});
+                }
+                else{
+                    vertices.push_back({start, linesColor.color});
+                    vertices.push_back({end,   linesColor.color});
                 }
 
                 glm::vec3 arrowHeadLDir = glm::normalize(cross - dir) * arrowSize;
@@ -102,9 +111,7 @@ namespace DrawSupport {
 */
                 // Add line start and end points
                 
-                vertices.push_back({start, linesColor.color});
-                vertices.push_back({end,   linesColor.color});
-
+               
                 vertices.push_back({pos, randomColor.color});
                 vertices.push_back({tip, randomColor.color});
 

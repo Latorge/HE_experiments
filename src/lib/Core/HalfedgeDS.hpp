@@ -43,17 +43,10 @@ public:
     Vertex* addVertexDirect(glm::vec3 position);
     Vertex* addVertex(glm::vec3 position, bool checkDuplicates, float tolerance = 1e-10);
 
-    int addFace(Face* face) {
-        faces.push_back(face);
-        face->id=faceIDCounter;
-        return faceIDCounter++;  // Return the ID then increment the counter
-    }
-
-    int addHalfedge(Halfedge* halfedge) {
-        halfedges.push_back(halfedge);
-        halfedge->id=halfedgeIDCounter;
-        return halfedgeIDCounter++;  // Return the ID then increment the counter
-    }
+    bool removeHalfedge(Halfedge *halfedge);
+    bool removeFace(Face *face);
+    int addFace(Face* face);
+    int addHalfedge(Halfedge* halfedge);
 
     // Accessor methods
     Vertex*   getVertex(int index) const { return vertices[index]; }
@@ -65,9 +58,7 @@ public:
     const std::vector<Face*>&     getFaces() const { return faces; }
 
     // Method to get the next face ID without incrementing the counter
-    int getNextFaceID() const {
-        return faceIDCounter;
-    }
+    int getNextFaceID() const;
 
     void clear();
 
@@ -75,9 +66,7 @@ public:
     std::vector<std::vector<Halfedge *>> loopsExp();
 
     // Destructor to properly clean up memory
-    ~HalfedgeDS() {
-        clear();
-    }
+    ~HalfedgeDS();
    
 };
 

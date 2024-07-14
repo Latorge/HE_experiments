@@ -103,6 +103,8 @@ SET(Operations_SRC
     src/lib/Operations/setFromGeometry.cpp
     src/lib/Operations/cubeCreater.cpp
     src/lib/Operations/planeCreater.cpp
+    src/lib/Operations/removeEdge.cpp
+    src/lib/Operations/removeFace.cpp
 )
 
 SET(main_INC

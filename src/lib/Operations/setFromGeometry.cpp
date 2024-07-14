@@ -21,8 +21,8 @@ namespace Operations {
                 int i1 = cells[faceIndex][i];
                 int i2 = cells[faceIndex][(i + 1) % cells[faceIndex].size()];
 
-                std::cout<<i1<<std::endl;
-                std::cout<<i2<<std::endl;
+                //std::cout<<i1<<std::endl;
+                //std::cout<<i2<<std::endl;
                 
                 // Ensure vertices exist
                 Vertex* v1 = nullptr;
@@ -69,8 +69,8 @@ namespace Operations {
                     Halfedge* h2 = h1->twin;
                     std::string hash2 = std::to_string(i2) + "-" + std::to_string(i1);
 
-                    std::cout<<hash1<<std::endl;
-                    std::cout<<hash2<<std::endl;
+                    //std::cout<<hash1<<std::endl;
+                    //std::cout<<hash2<<std::endl;
 
                     halfedgeMap[hash1] = h1;
                     halfedgeMap[hash2] = h2;
@@ -81,11 +81,12 @@ namespace Operations {
                // loopHalfedges[i] = h1;
                 loopHalfedges.push_back(h1);
             }
-
+/*
             for(auto he: loopHalfedges)
             {
                 std::cout<<he->getId()<<std::endl;
             }
+*/
             // Create the face from the loop of halfedges
             //Face* face = new Face(loopHalfedges.front(), structure.getNextFaceID());
             Face* face = Operations::addFace(structure,loopHalfedges);

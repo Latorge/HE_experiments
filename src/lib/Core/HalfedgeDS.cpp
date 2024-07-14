@@ -77,3 +77,47 @@ Vertex* HalfedgeDS::addVertex(glm::vec3 position, bool checkDuplicates, float to
     v->subGroup = -1;
     return v;
 }
+
+
+int HalfedgeDS::addFace(Face* face) {
+    faces.push_back(face);
+    face->id=faceIDCounter;
+    return faceIDCounter++;  // Return the ID then increment the counter
+}
+
+int HalfedgeDS::addHalfedge(Halfedge* halfedge) {
+    halfedges.push_back(halfedge);
+    halfedge->id=halfedgeIDCounter;
+    return halfedgeIDCounter++;  // Return the ID then increment the counter
+}
+
+// Method to remove a halfedge from the vector
+bool HalfedgeDS::removeHalfedge(Halfedge* halfedge) {
+    auto it = std::find(halfedges.begin(), halfedges.end(), halfedge);
+    if (it != halfedges.end()) {
+        halfedges.erase(it);
+        delete halfedge; // Deallocate memory if halfedges are dynamically allocated
+        return true;
+    }
+    return false;
+}
+
+
+bool HalfedgeDS::removeFace(Face* face) {
+        auto it = std::find(faces.begin(), faces.end(), face);
+        if (it != faces.end()) {
+            faces.erase(it);
+            delete face;  // Free the memory if Faces are dynamically allocated
+            return true;
+        }
+        return false;  // Face not found
+}
+
+int HalfedgeDS::getNextFaceID() const {
+    return faceIDCounter;
+}
+
+ // Destructor to properly clean up memory
+HalfedgeDS::~HalfedgeDS() {
+    clear();
+}

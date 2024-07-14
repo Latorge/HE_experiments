@@ -30,6 +30,8 @@ namespace Operations {
     Face*     addFace(HalfedgeDS& structure, std::vector<Halfedge*>& halfedges);
     Halfedge* addEdge(HalfedgeDS& structDS, Vertex* v1,Vertex* v2, bool allowParallels = false);
     bool makeHalfedgesAdjacent(Halfedge* halfIn, Halfedge* halfOut);
+    void removeEdge(HalfedgeDS& ds, Halfedge* halfedge, bool mergeFaces = true);
+    bool removeFace(HalfedgeDS& ds, Face* face);
 
 
 
