@@ -9,6 +9,9 @@
 #include <glm/glm.hpp>
 #include <string>
 
+#include <vector>
+#include <optional>
+
 
 #include "../Core/Vertex.hpp"
 #include "../Core/Halfedge.hpp"
@@ -27,6 +30,20 @@ namespace Operations {
     Face*     addFace(HalfedgeDS& structure, std::vector<Halfedge*>& halfedges);
     Halfedge* addEdge(HalfedgeDS& structDS, Vertex* v1,Vertex* v2, bool allowParallels = false);
     bool makeHalfedgesAdjacent(Halfedge* halfIn, Halfedge* halfOut);
+
+
+
+class HalfedgeGenerator {
+    Vertex* vertex;
+    Halfedge* start;
+    Halfedge* current;
+    bool firstCall;
+
+public:
+    HalfedgeGenerator(Vertex* v, Halfedge* s = nullptr);
+    std::optional<Halfedge*> next() ;
+    void reset() ;
+};
    
 /*
     void setFromGeometry(HalfedgeDS& structure,const std::vector<glm::vec3>& positions,const std::vector<std::vector<int>>& cells, double tolerance = 1e-10);

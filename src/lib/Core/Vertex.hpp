@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
 #include <glm/glm.hpp>
 #include "Struct.hpp"
 
@@ -40,10 +41,9 @@ public:
 
     Halfedge* getHalfedgeToVertex(Vertex* other);
     bool isConnectedToVertex(Vertex* other);
-    std::vector<Halfedge*> loopCW() ;
-   // glm::vec3 calculateVertexNormal() ;
+     glm::vec3 calculateVertexNormal();
+    //std::vector<Halfedge*> loopCW() ;
 
-    //FreeHalfedgeIterator freeHalfedgesInLoopIter();
 
     class CWIterator {
     private:
@@ -123,7 +123,8 @@ public:
     CCWIterator endCCW() { return CCWIterator(nullptr, false); }
 
 private:
-    float calculateAngleWeight(Face* face, const glm::vec3& faceNormal, size_t numCommonVertices) ;
+   
+    float calculateAngleWeight(Face *face, const glm::vec3 &faceNormal, size_t numCommonVertices);
 };
 
 

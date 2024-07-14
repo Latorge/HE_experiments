@@ -74,3 +74,54 @@ bool Face::hasVertex(Vertex* vertex) {
     }
     return false;
 }
+
+
+std::vector<Vertex*> Face::getVertices() {
+    std::vector<Vertex*> vertices;
+    if (!this->halfedge) return vertices;  // return empty if no halfedges
+
+    Halfedge* start = this->halfedge;
+    Halfedge* currentHalfedge = start;
+
+    do {
+        vertices.push_back(currentHalfedge->vertex);
+        currentHalfedge = currentHalfedge->next;
+    } while (currentHalfedge != start);
+
+    return vertices;
+}
+
+std::vector<Halfedge*> Face::getHalfedges() {
+    std::vector<Halfedge*> halfedges;
+    if (!this->halfedge) return halfedges;  // return empty if no halfedges
+
+    Halfedge* start = this->halfedge;
+    Halfedge* currentHalfedge = start;
+
+    do {
+        halfedges.push_back(currentHalfedge);
+        currentHalfedge = currentHalfedge->next;
+    } while (currentHalfedge != start);
+
+    return halfedges;
+}
+
+std::vector<Vertex*> Face::commonVerticesWithVertex(Vertex* vertex) {
+    std::vector<Vertex*> commonVertices;
+    std::vector<Vertex*> vertices = this->getVertices();
+
+    for (Vertex* vertexOfFace : vertices) {
+        if (vertexOfFace != vertex) {
+            commonVertices.push_back(vertexOfFace);
+        }
+    }
+
+    return commonVertices;
+}
+
+bool Face::isNormalCalculated() const {
+    return normalFlag;
+}
+
+
+

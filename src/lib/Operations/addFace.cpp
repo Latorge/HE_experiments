@@ -17,7 +17,8 @@ namespace Operations {
             Halfedge* next = halfedges[(i + 1) % size];
 
             if (curr->face) {
-                throw std::runtime_error("Halfedge already has a face");
+               // return curr->face;
+              throw std::runtime_error("Halfedge already has a face");
             }
 
             if (curr->twin->vertex != next->vertex) {

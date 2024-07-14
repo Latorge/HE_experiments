@@ -6,8 +6,8 @@ namespace HalfedgeLib {
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
 
-        //auto protoCube=Operations::generateQuadArraysCube(3,3,3,1.0);
-        auto protoCube=Operations::generateQuadArrays(2,2,1.0);
+        //auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
+        auto protoCube=Operations::generateQuadArrays(5,5,1.0);
 /*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
@@ -15,11 +15,24 @@ namespace HalfedgeLib {
         }
         */
         auto protoCubeUniqVertex=Operations::computeUniquePositionsArray(protoCube.positions,protoCube.cells);
-
+/*
          for (auto& pos : protoCubeUniqVertex.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
 
         }
+
+        std::cout << "---------------------" << std::endl;
+        for(auto cellArray: protoCubeUniqVertex.cells)
+        {
+            for(auto index:cellArray)
+            {
+                std::cout << index << std::endl;
+            }
+            std::cout << "---------" << std::endl;
+        }
+
+        std::cout << "---------------------" << std::endl;
+*/
         Operations::setFromGeometry(halfedgeDS01,protoCubeUniqVertex.positions, protoCubeUniqVertex.cells);
         //Operations::setFromGeometry(halfedgeDS01,protoCube.positions, protoCube.cells);
 

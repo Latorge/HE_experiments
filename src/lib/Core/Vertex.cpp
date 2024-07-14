@@ -37,12 +37,11 @@ std::vector<Halfedge*> Vertex::freeHalfedgesInLoop(Halfedge* start = nullptr) {
 
 Halfedge* Vertex::freeHalfedgesInLoopNext(Halfedge* start) {
     if (!start) start = this->halfedge; // Use the vertex's halfedge if no start is provided
-
     int count = 0;  // Counter to find the second free halfedge
-
     // Iterate over the halfedges in a clockwise direction
     for (auto it =  beginCW(start); it != endCW(); ++it) {
         // Check if the twin of the current halfedge exists and is free
+       // if ((*it).twin && (*it).twin->isFree()) {
         if ((*it).twin && (*it).twin->isFree()) {
             count++;
             if (count == 2) {
@@ -62,13 +61,11 @@ Halfedge* Vertex::findBoundaryHalfedge(Halfedge* halfIn, Halfedge* halfOut) {
     auto it = halfOut->vertex->beginCW(halfOut);
     while (it.hasNext()) {
         Halfedge* he = it.next();
-        
         // Check if this halfedge is free and is not the input halfedge
         if (he->isFree() && he != halfIn) {
             g = he;
             break;
         }
-
         // Make sure to not infinitely loop; stop if we come back to the starting point
         if (he == halfOut) break;
     }
@@ -94,13 +91,19 @@ bool Vertex::isIsolated() {
 }
 
 std::vector<Face*> Vertex::commonFacesWithVertex(Vertex* other) {
-    std::vector<Face*> faces;
-    for (auto he : loopCW()) {
-        if (halfedge->face && halfedge->face->hasVertex(other)) {
-            faces.push_back(halfedge->face);
+    std::vector<Face*> commonFaces;
+
+    // Use the CWIterator to iterate over the halfedges in a clockwise direction
+    for (auto it = beginCW(); it != endCW(); ++it) {
+         // Since the iterator returns a Halfedge reference, get the pointer with the address-of operator
+        Halfedge* he = &(*it);
+        // Check if the current halfedge has a face and if the face includes the other vertex
+        if (he->face && he->face->hasVertex(other)) {
+            commonFaces.push_back(he->face);
         }
     }
-    return faces;
+
+    return commonFaces;
 }
 
 bool Vertex::matchesPosition(const glm::vec3& pos, float tolerance = 1e-10) {
@@ -108,10 +111,18 @@ bool Vertex::matchesPosition(const glm::vec3& pos, float tolerance = 1e-10) {
     return glm::length(delta) < tolerance;
 }
 
+/**
+ * Returns the halfedge going from this vertex to the other vertex if any.
+ *
+ * @param other A pointer to the other vertex to find the halfedge to.
+ * @return A pointer to the Halfedge if found, nullptr otherwise.
+ */
 Halfedge* Vertex::getHalfedgeToVertex(Vertex* other) {
-    for (auto he : loopCW()) {
-        if (halfedge->twin && halfedge->twin->vertex == other) {
-            return he;
+    // Use the CWIterator to iterate over the halfedges in a clockwise direction
+    for (auto it = beginCW(); it != endCW(); ++it) {
+        // Check if the twin of the current halfedge points to the other vertex
+        if ((*it).twin && (*it).twin->vertex == other) {
+            return &(*it);
         }
     }
     return nullptr;
@@ -120,7 +131,7 @@ Halfedge* Vertex::getHalfedgeToVertex(Vertex* other) {
 bool Vertex::isConnectedToVertex(Vertex* other) {
     return getHalfedgeToVertex(other) != nullptr;
 }
-
+/*
 std::vector<Halfedge*> Vertex::loopCW() {
     std::vector<Halfedge*> edges;
     if (!halfedge) return edges;
@@ -134,26 +145,42 @@ std::vector<Halfedge*> Vertex::loopCW() {
 
     return edges;
 }
-/*
+*/
+// Function to calculate the normal of the vertex
 glm::vec3 Vertex::calculateVertexNormal() {
-    glm::vec3 normal(0.0f);
+    glm::vec3 normal(0.0f, 0.0f, 0.0f);
     std::set<Face*> sharedFaces;
-    for (auto he : loopCW()) {
-        if (he->face) {
-            sharedFaces.insert(he->face);
+
+    // Collect faces that share this vertex
+    for (auto it = beginCW(); it != endCW(); ++it) {
+        if ((*it).face) {
+            sharedFaces.insert((*it).face);
         }
     }
-    for (const auto& face : sharedFaces) {
+
+    // Calculate the weighted sum of face normals
+    for (auto face : sharedFaces) {
+        auto commonVertices = face->commonVerticesWithVertex(this);
+        if (!face->isNormalCalculated())
+            face->calculateNormal();
+        if (face->normal == glm::vec3(0.0f)) {
+            std::cerr << "Cannot calculate normal in vertex module calculateVertexNormal\n";
+            return glm::vec3(1.0f, 1.0f, 1.0f);
+        }
         glm::vec3 faceNormal = face->normal;
+
+        // Check if the vertex is on the back side of the face
         if (!face->hasVertex(this)) {
             faceNormal = -faceNormal;
         }
-        float angleWeight = calculateAngleWeight(face, faceNormal, face->commonVerticesWithVertex(this));
+
+        float angleWeight = calculateAngleWeight(face, faceNormal, commonVertices.size());
         normal += faceNormal * angleWeight;
     }
+
     return glm::normalize(normal);
 }
-*/
+
 float Vertex::calculateAngleWeight(Face* face, const glm::vec3& faceNormal, size_t numCommonVertices) {
     glm::vec3 vertexToFaceCenter = face->calculateCenterPoint() - position;
     return std::acos(glm::dot(faceNormal, vertexToFaceCenter) / (glm::length(faceNormal) * glm::length(vertexToFaceCenter))) / numCommonVertices;
@@ -161,7 +188,7 @@ float Vertex::calculateAngleWeight(Face* face, const glm::vec3& faceNormal, size
 
  // Prefix increment
 Vertex::CWIterator& Vertex::CWIterator::operator++() {
-    if (current && current->twin) {
+     if (current && current->twin) {
         current = current->twin->next;
         if (current == start) {
             if (!firstPass) {

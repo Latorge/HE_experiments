@@ -15,11 +15,14 @@ namespace Operations {
         std::unordered_map<std::string, Halfedge*> halfedgeMap;
 
         for (size_t faceIndex = 0; faceIndex < cells.size(); faceIndex++) {
-            std::vector<Halfedge*> loopHalfedges(cells[faceIndex].size(), nullptr);
+            std::vector<Halfedge*> loopHalfedges;//(cells[faceIndex].size(), nullptr);
 
             for (size_t i = 0; i < cells[faceIndex].size(); i++) {
                 int i1 = cells[faceIndex][i];
                 int i2 = cells[faceIndex][(i + 1) % cells[faceIndex].size()];
+
+                std::cout<<i1<<std::endl;
+                std::cout<<i2<<std::endl;
                 
                 // Ensure vertices exist
                 Vertex* v1 = nullptr;
@@ -60,25 +63,38 @@ namespace Operations {
                 }
 */
                 if (halfedgeMap.find(hash1) == halfedgeMap.end()) {
+
+                   
                     h1 = Operations::addEdge(structure, v1, v2);
                     Halfedge* h2 = h1->twin;
-                    
+                    std::string hash2 = std::to_string(i2) + "-" + std::to_string(i1);
+
+                    std::cout<<hash1<<std::endl;
+                    std::cout<<hash2<<std::endl;
+
                     halfedgeMap[hash1] = h1;
-                    halfedgeMap[std::to_string(i2) + "-" + std::to_string(i1)] = h2;
+                    halfedgeMap[hash2] = h2;
                 } else {
                     h1 = halfedgeMap[hash1];
                 }
 
-                loopHalfedges[i] = h1;
+               // loopHalfedges[i] = h1;
+                loopHalfedges.push_back(h1);
             }
 
+            for(auto he: loopHalfedges)
+            {
+                std::cout<<he->getId()<<std::endl;
+            }
             // Create the face from the loop of halfedges
             //Face* face = new Face(loopHalfedges.front(), structure.getNextFaceID());
             Face* face = Operations::addFace(structure,loopHalfedges);
             //structure.addFace(face);
+            /*
             for (Halfedge* he : loopHalfedges) {
                 he->face = face;
             }
+            */
         }
     }
 

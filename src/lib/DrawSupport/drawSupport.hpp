@@ -55,6 +55,7 @@ namespace DrawSupport {
     std::vector<DrawSupport::PointInfo> setHalgEdgesLines(HalfedgeDS& halfedgeDS);
 
     std::vector<DrawSupport::PointInfo> setHalgEdgesLines2(HalfedgeDS& halfedgeDS);
+    std::vector<DrawSupport::PointInfo> setHalgEdgesLines3(HalfedgeDS& halfedgeDS);
 
 }
 

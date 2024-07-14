@@ -92,13 +92,93 @@ namespace Operations {
             }
         };
 
+             // generate front plane cells -Z blue
+        for (int i = 0; i < NF - 1; i++) {
+            for (int j = 0; j < MF - 1; j++) {
+                int a = i * MF + j;
+                int b = a + 1;
+                int c = a + MF;
+                int d = c + 1;
+
+                mesh.cells.push_back({d, c, a, b});
+            }
+        }
+
+        // generate back plane cells +Z
+        int cbackOffset = NF * MF;
+        for (int i = 0; i < NF - 1; i++) {
+            for (int j = 0; j < MF - 1; j++) {
+                int a = i * MF + j + cbackOffset;
+                int b = a + 1;
+                int c = a + MF;
+                int d = c + 1;
+
+                mesh.cells.push_back({a, c, d, b});
+
+            }
+        }
+
+        // generate left plane cells -X
+        int cleftOffset = 2 * backOffset;
+        for (int i = 0; i < LF - 1; i++) {
+            for (int j = 0; j < MF - 1; j++) {
+                int a = i * MF + j + cleftOffset;
+                int b = a + 1;
+                int c = a + MF;
+                int d = c + 1;
+
+                mesh.cells.push_back({d, b, a, c});
+            }
+        }
+
+        // generate right plane cells +X
+        int crightOffset = leftOffset + LF * MF;
+        for (int i = 0; i < LF - 1; i++) {
+            for (int j = 0; j < MF - 1; j++) {
+                int a = i * MF + j + crightOffset;
+                int b = a + 1;
+                int c = a + MF;
+                int d = c + 1;
+
+                mesh.cells.push_back({a, b, d, c});
+            }
+        }
+
+        // generate top plane cells
+        int ctopOffset = rightOffset + LF * MF;
+        for (int i = 0; i < NF - 1; i++) {
+            for (int j = 0; j < LF - 1; j++) {
+                int a = i * LF + j + ctopOffset;
+                int b = a + 1;
+                int c = a + LF;
+                int d = c + 1;
+
+                mesh.cells.push_back({d, c, a, b});
+            }
+        }
+
+        // generate bottom plane cells
+        int cbottomOffset = topOffset + NF * LF;
+        for (int i = 0; i < NF - 1; i++) {
+            for (int j = 0; j < LF - 1; j++) {
+                int a = i * LF + j + cbottomOffset;
+                int b = a + 1;
+                int c = a + LF;
+                int d = c + 1;
+
+                //cells.push({a, b, d, c});
+                mesh.cells.push_back({a, c, d, b});
+            }
+        }
+
+/*
         generateCells(0, NF, MF);             // Front
         generateCells(backOffset, NF, MF);    // Back
         generateCells(leftOffset, LF, MF);    // Left
         generateCells(rightOffset, LF, MF);   // Right
         generateCells(topOffset, NF, LF);     // Top
         generateCells(bottomOffset, NF, LF);  // Bottom
-
+*/
 
         return mesh;
     }
