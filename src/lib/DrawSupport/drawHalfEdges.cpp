@@ -53,6 +53,7 @@ namespace DrawSupport {
         std::random_device rd;
         std::mt19937 eng(rd());
         std::uniform_int_distribution<> distr(0, 0xFFFFFF);
+        std::uniform_int_distribution<> rndRange(-1.0, 1.0);
 
         for (auto& face : halfedgeDS.getFaces()) {
             face->calculateNormal();
@@ -63,8 +64,7 @@ namespace DrawSupport {
      
         for (auto& loop : loops) {
 
-            if(loop.size()<5)
-                continue;
+
             Color randomColor;
             randomColor.setHex(distr(eng));
             int counter=0;
@@ -81,23 +81,23 @@ namespace DrawSupport {
                 normal *= normalGapFactor;
                 cross *= crossGapFactor;
 
-
+                float deltaMove=0.05;
                 glm::vec3 pos = start + normal + cross + dir;
-                glm::vec3 tip = end   + normal + cross - dir;
+                glm::vec3 tip = end   + normal + cross - dir;//+glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));;
 
                 if(he->isBoundary()) {
-                    pos = start + normal - cross + dir;
-                    tip = end   + normal - cross - dir;
+                    start +=glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));
+                    end   +=glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));
                 }
 
-                else if(onlyBoundaryLines) {
-                    continue;
-                }
-
-                if(he->isBoundary() || he->twin->isBoundary()) {
+            
+                if(he->isBoundary()) {
                     vertices.push_back({start, randomColor.color});
                     vertices.push_back({end,   randomColor.color});
                 }
+
+                if(onlyBoundaryLines)
+                        continue;
                 else{
                     vertices.push_back({start, linesColor.color});
                     vertices.push_back({end,   linesColor.color});
@@ -107,8 +107,6 @@ namespace DrawSupport {
                     glm::vec3 arrowHeadLDir = glm::normalize(cross - dir) * arrowSize;
                     glm::vec3 arrowHeadRDir = glm::normalize(-cross - dir) * arrowSize;
 
-                    
-                
                     vertices.push_back({pos, randomColor.color});
                     vertices.push_back({tip, randomColor.color});
 

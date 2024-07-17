@@ -28,7 +28,7 @@ bool Halfedge::isFree() const {
 
 bool Halfedge::isBoundary() const {
     //return face == nullptr && twin && twin->face != nullptr;
-    return face == nullptr && twin->face != nullptr;
+    return (face == nullptr && twin->face != nullptr);
 }
 
 bool Halfedge::isConcave() const {

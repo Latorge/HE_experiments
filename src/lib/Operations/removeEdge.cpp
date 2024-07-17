@@ -40,9 +40,14 @@ namespace Operations {
             {
                // removeFace(ds, halfedge->face);
                 std::vector<Halfedge*> markedHalfedges=halfedge->face->getHalfedges();
-                 ds.removeFace(halfedge->face);
+                //removeFace(ds, halfedge->face);
+                ds.removeFace(halfedge->face);
                 for (Halfedge* he : markedHalfedges) { 
                    he->face=nullptr;
+                   if(!he->twin->face)
+                   {
+                      removeEdge(ds,he);
+                   }
                 }
                
             }
@@ -50,9 +55,14 @@ namespace Operations {
             if (twin->face) {
                // removeFace(ds, twin->face);
                 std::vector<Halfedge*> markedHalfedges=twin->face->getHalfedges();
+                //removeFace(ds, twin->face);
                 ds.removeFace(twin->face);
                 for (Halfedge* he : markedHalfedges) { 
                     he->face=nullptr;
+                    if(!he->twin->face)
+                    {
+                        removeEdge(ds,he);
+                    }
                 }
                 
             }
@@ -60,6 +70,10 @@ namespace Operations {
 
         // Update topology around v1
         Vertex* v1 = halfedge->vertex;
+
+        if(!ds.containsHalfedge(halfedge))
+            return;
+
         if(v1->halfedge == halfedge)
         {
             if (twin->next == halfedge) {
@@ -71,6 +85,9 @@ namespace Operations {
         }
         halfedge->prev->next = twin->next;
         twin->next->prev = halfedge->prev;
+
+        if(!ds.containsHalfedge(twin))
+            return;
 
         // Update topology around v2
         Vertex* v2 = twin->vertex;
