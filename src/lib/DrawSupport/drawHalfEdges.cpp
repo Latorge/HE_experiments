@@ -3,7 +3,7 @@
 
 namespace DrawSupport {
 
-    std::vector<DrawSupport::PointInfo> setHalgEdgesLines(HalfedgeDS& halfedgeDS) {
+    std::vector<DrawSupport::PointInfo> setHalfEdgesLines(HalfedgeDS& halfedgeDS) {
         std::vector<DrawSupport::PointInfo> vertices;
         float arrowSize = 0.035f;
         Color linesColor;
@@ -39,7 +39,7 @@ namespace DrawSupport {
     }
 
 
-    std::vector<DrawSupport::PointInfo> setHalgEdgesLines2(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines) {
+    std::vector<DrawSupport::PointInfo> setHalfEdgesLines2(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines) {
         const float arrowSize = 0.035f;
         const float crossGapFactor = 0.03f;
         const float dirGapFactor = 0.15f;
@@ -124,7 +124,7 @@ namespace DrawSupport {
         return vertices;
     }
 
-    std::vector<DrawSupport::PointInfo> setHalgEdgesLines3(HalfedgeDS& halfedgeDS) {
+    std::vector<DrawSupport::PointInfo> setHalfEdgesLines3(HalfedgeDS& halfedgeDS) {
         const float arrowSize = 0.035f;
         const float crossGapFactor = 0.03f;
         const float dirGapFactor = 0.15f;

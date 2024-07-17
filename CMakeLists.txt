@@ -106,6 +106,7 @@ SET(Operations_SRC
     src/lib/Operations/planeCreater.cpp
     src/lib/Operations/removeEdge.cpp
     src/lib/Operations/removeFace.cpp
+    src/lib/Operations/cutFace.cpp
 )
 
 SET(main_INC

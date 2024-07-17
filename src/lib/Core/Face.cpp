@@ -54,6 +54,23 @@ Halfedge* Face::halfedgeFromPosition(const glm::vec3& position, float tolerance 
     return nullptr;
 }
 
+// Returns the face halfedge starting from the given vertex
+Halfedge* Face::halfedgeFromVertex(Vertex* vertex) {
+    if (!this->halfedge) return nullptr; // No halfedges to search from
+
+    Halfedge* start = this->halfedge;
+    Halfedge* current = start;
+
+    do {
+        if (current->vertex == vertex) {
+            return current;
+        }
+        current = current->next;
+    } while (current != start);
+
+    return nullptr;  // No halfedge starts from the given vertex
+}
+
 Vertex*  Face::vertexFromPosition(const glm::vec3& position, float tolerance = 1e-10) {
     auto current = halfedge;
     do {

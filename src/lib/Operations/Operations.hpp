@@ -33,18 +33,21 @@ namespace Operations {
     void removeEdge(HalfedgeDS& ds, Halfedge* halfedge, bool mergeFaces = true);
     bool removeFace(HalfedgeDS& ds, Face* face);
 
+    Halfedge* cutFace(HalfedgeDS& structDS,Face* face, Vertex* v1, Vertex* v2, bool createNewFace);
+    bool isInSameLoop(Halfedge *h1, Halfedge *h2);
+    void updateFaceReferences(Halfedge *start, Face *newFace);
 
+    class HalfedgeGenerator
+    {
+        Vertex *vertex;
+        Halfedge *start;
+        Halfedge *current;
+        bool firstCall;
 
-class HalfedgeGenerator {
-    Vertex* vertex;
-    Halfedge* start;
-    Halfedge* current;
-    bool firstCall;
-
-public:
-    HalfedgeGenerator(Vertex* v, Halfedge* s = nullptr);
-    std::optional<Halfedge*> next() ;
-    void reset() ;
+    public:
+        HalfedgeGenerator(Vertex *v, Halfedge *s = nullptr);
+        std::optional<Halfedge *> next();
+        void reset();
 };
    
 /*

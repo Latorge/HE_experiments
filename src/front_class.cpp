@@ -7,8 +7,8 @@ namespace HalfedgeLib {
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
        // auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
-       // auto protoCube=Operations::generateQuadArrays(15,15,1.0);
-        auto protoCube=Operations::generateQuadArraysCube(35,35,5,1.0);
+        auto protoCube=Operations::generateQuadArrays(1,1,1.0);
+      //  auto protoCube=Operations::generateQuadArraysCube(35,35,5,1.0);
 /*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
@@ -48,7 +48,9 @@ namespace HalfedgeLib {
         Operations::removeFace(halfedgeDS01,faceExp3);
 */  
       // processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
-        processRandomDeleteHalfedges(halfedgeDS01, 1, 0.075f);
+      //  processRandomDeleteHalfedges(halfedgeDS01, 1, 0.075f);
+
+      Operations::cutFace(halfedgeDS01, halfedgeDS01.getFace(0),halfedgeDS01.getVertex(0), halfedgeDS01.getVertex(2), true);
 
         std::cout<<"HEDS number faces: "<<halfedgeDS01.getFaces().size()<<std::endl;
         std::cout<<"HEDS number vertex: "<<halfedgeDS01.getVertices().size()<<std::endl;
@@ -63,7 +65,7 @@ namespace HalfedgeLib {
     std::vector<DrawSupport::PointInfo> FrontClass::getLinesfromHEDS(HalfedgeDS& halfedgeDS)
     {
         std::vector<DrawSupport::PointInfo> resultList;
-        resultList=DrawSupport::setHalfEdgesLines4(halfedgeDS, true);
+        resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, false);
         return resultList;
     }
 
