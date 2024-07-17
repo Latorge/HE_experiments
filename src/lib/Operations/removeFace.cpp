@@ -4,6 +4,20 @@
 namespace Operations {
 
     bool removeFace(HalfedgeDS& ds, Face* face) {
+        
+        std::vector<Halfedge*> markedHalfedges=face->getHalfedges();
+        for (Halfedge* he : markedHalfedges) { 
+            he->face=nullptr;
+            if (he->twin && he->twin->face == nullptr) {
+               removeEdge(ds, he);
+            }
+        }
+        ds.removeFace(face);
+        return true;
+    }
+
+/*proto code
+    bool removeFace(HalfedgeDS& ds, Face* face) {
         std::vector<Halfedge*> markedHalfedges;
 
         // Assuming face->halfedge points to one halfedge on the face
@@ -21,8 +35,10 @@ namespace Operations {
         // Remove the marked halfedges
         for (Halfedge* halfedge : markedHalfedges) {
             removeEdge(ds, halfedge);
+            //ds.removeHalfedge(halfedge);
             if (halfedge->twin) {
                 removeEdge(ds, halfedge->twin);
+                //ds.removeHalfedge( halfedge->twin);
             }
         }
 
@@ -30,7 +46,7 @@ namespace Operations {
 
         return true;
     }
-        
+ */
 
 
 }

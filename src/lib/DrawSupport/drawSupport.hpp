@@ -18,10 +18,15 @@
 
 namespace DrawSupport {
 
-    struct PointInfo
-    {
+    struct PointInfo {
         glm::vec3 position;
         glm::vec3 color;
+    };
+
+    struct GeometryData {
+        std::vector<glm::vec3> vertices;
+        std::vector<glm::vec4> colors;
+        std::vector<glm::vec3> normals;
     };
 
     struct Color {
@@ -54,9 +59,15 @@ namespace DrawSupport {
 
     std::vector<DrawSupport::PointInfo> setHalgEdgesLines(HalfedgeDS& halfedgeDS);
 
-    std::vector<DrawSupport::PointInfo> setHalgEdgesLines2(HalfedgeDS& halfedgeDS);
+    std::vector<DrawSupport::PointInfo> setHalgEdgesLines2(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines=false);
     std::vector<DrawSupport::PointInfo> setHalgEdgesLines3(HalfedgeDS& halfedgeDS);
 
+    //Tringulate 
+
+    glm::vec3 calculateCentralPoint(const std::vector<Vertex *> &vertices);
+    void addTriangleToData(DrawSupport::GeometryData &data, const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3, const glm::vec3 &normal);
+    DrawSupport::GeometryData triangulateFace(Face *face);
+    DrawSupport::GeometryData processTriangulateHalfedgeDS(HalfedgeDS &halfedgeDS);
 }
 
 #endif // DRAWSUPPORT_HPP

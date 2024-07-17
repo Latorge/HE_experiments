@@ -44,7 +44,10 @@ public:
     Vertex* addVertex(glm::vec3 position, bool checkDuplicates, float tolerance = 1e-10);
 
     bool removeHalfedge(Halfedge *halfedge);
+    bool containsHalfedge(Halfedge *halfedge);
     bool removeFace(Face *face);
+    bool removeVertex(Vertex *vertex);
+    
     int addFace(Face* face);
     int addHalfedge(Halfedge* halfedge);
 
@@ -71,3 +74,5 @@ public:
 };
 
 #endif // HALFEDGE_DS_H
+
+

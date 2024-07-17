@@ -62,9 +62,9 @@ std::vector<Halfedge*> Halfedge::nextLoop() {
     Halfedge* start = this;
     do {
         loop.push_back(start);
-        start->visited = true;
+        //start->visited = true;
         start = start->next;
-    } while (start != this && start != nullptr);
+    } while (start != this);
     return loop;
 }
 

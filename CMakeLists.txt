@@ -88,6 +88,7 @@ SET(DrawSupport_INC
 )
 SET(DrawSupport_SRC
     src/lib/DrawSupport/drawHalfEdges.cpp
+    src/lib/DrawSupport/triangulateCentralPoint.cpp
 
 )
 

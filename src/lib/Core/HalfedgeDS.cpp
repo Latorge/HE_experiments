@@ -97,10 +97,21 @@ bool HalfedgeDS::removeHalfedge(Halfedge* halfedge) {
     if (it != halfedges.end()) {
         halfedges.erase(it);
         delete halfedge; // Deallocate memory if halfedges are dynamically allocated
+        //halfedgeIDCounter--;
         return true;
     }
     return false;
 }
+
+// Method to remove a halfedge from the vector
+bool HalfedgeDS::containsHalfedge(Halfedge* halfedge) {
+    auto it = std::find(halfedges.begin(), halfedges.end(), halfedge);
+    if (it != halfedges.end()) {
+        return true;
+    }
+    return false;
+}
+
 
 
 bool HalfedgeDS::removeFace(Face* face) {
@@ -108,10 +119,27 @@ bool HalfedgeDS::removeFace(Face* face) {
         if (it != faces.end()) {
             faces.erase(it);
             delete face;  // Free the memory if Faces are dynamically allocated
+            //faceIDCounter--;
             return true;
         }
         return false;  // Face not found
 }
+
+bool HalfedgeDS::removeVertex(Vertex* vertex) {
+    auto it = std::find(vertices.begin(), vertices.end(), vertex);
+    if (it != vertices.end()) {
+        // Before removing the vertex, you might need to handle associated halfedges
+        // For example, you might need to update or remove halfedges that reference this vertex
+        //updateHalfedgesBeforeVertexRemoval(vertex);
+        // Now remove the vertex from the list
+        vertices.erase(it);
+        // Optional: if the Vertex objects are dynamically allocated
+        delete vertex;
+        return true; // Vertex successfully removed
+    }
+    return false; // Vertex not found
+}
+    
 
 int HalfedgeDS::getNextFaceID() const {
     return faceIDCounter;

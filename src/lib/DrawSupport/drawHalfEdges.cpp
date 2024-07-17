@@ -39,11 +39,11 @@ namespace DrawSupport {
     }
 
 
-    std::vector<DrawSupport::PointInfo> setHalgEdgesLines2(HalfedgeDS& halfedgeDS) {
+    std::vector<DrawSupport::PointInfo> setHalgEdgesLines2(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines) {
         const float arrowSize = 0.035f;
         const float crossGapFactor = 0.03f;
         const float dirGapFactor = 0.15f;
-        const float normalGapFactor = 0.03f;
+        const float normalGapFactor = 0.005f;
 
         Color linesColor;
         linesColor.setHex(0xFFFFFF);  // White color for lines
@@ -59,8 +59,12 @@ namespace DrawSupport {
         }
 
         auto loops = halfedgeDS.loops();
+        
      
         for (auto& loop : loops) {
+
+            if(loop.size()<5)
+                continue;
             Color randomColor;
             randomColor.setHex(distr(eng));
             int counter=0;
@@ -86,6 +90,10 @@ namespace DrawSupport {
                     tip = end   + normal - cross - dir;
                 }
 
+                else if(onlyBoundaryLines) {
+                    continue;
+                }
+
                 if(he->isBoundary() || he->twin->isBoundary()) {
                     vertices.push_back({start, randomColor.color});
                     vertices.push_back({end,   randomColor.color});
@@ -95,31 +103,21 @@ namespace DrawSupport {
                     vertices.push_back({end,   linesColor.color});
                 }
 
-                glm::vec3 arrowHeadLDir = glm::normalize(cross - dir) * arrowSize;
-                glm::vec3 arrowHeadRDir = glm::normalize(-cross - dir) * arrowSize;
-/*
-                if(counter%2==0)
-                {
-                    vertices.push_back({start, linesColor.color});
-                    vertices.push_back({end,   linesColor.color});
-                }
-                else
-                {
-                    vertices.push_back({start, randomColor.color});
-                    vertices.push_back({end,   randomColor.color});
-                }
-*/
-                // Add line start and end points
-                
-               
-                vertices.push_back({pos, randomColor.color});
-                vertices.push_back({tip, randomColor.color});
+                if(!onlyBoundaryLines) {
+                    glm::vec3 arrowHeadLDir = glm::normalize(cross - dir) * arrowSize;
+                    glm::vec3 arrowHeadRDir = glm::normalize(-cross - dir) * arrowSize;
 
-                // Add arrowheads
-                vertices.push_back({tip, randomColor.color});
-                vertices.push_back({tip + arrowHeadLDir, randomColor.color});
-                vertices.push_back({tip, randomColor.color});
-                vertices.push_back({tip + arrowHeadRDir, randomColor.color});
+                    
+                
+                    vertices.push_back({pos, randomColor.color});
+                    vertices.push_back({tip, randomColor.color});
+
+                    // Add arrowheads
+                    vertices.push_back({tip, randomColor.color});
+                    vertices.push_back({tip + arrowHeadLDir, randomColor.color});
+                    vertices.push_back({tip, randomColor.color});
+                    vertices.push_back({tip + arrowHeadRDir, randomColor.color});
+                }
                 
                counter++;
             }
