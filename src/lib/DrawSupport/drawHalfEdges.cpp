@@ -205,6 +205,131 @@ namespace DrawSupport {
         return vertices;
     }
 
+    std::vector<DrawSupport::PointInfo> setHalfEdgesLines4(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines) {
+        const float arrowSize = 0.035f;
+        const float crossGapFactor = 0.03f;
+        const float dirGapFactor = 0.15f;
+        const float normalGapFactor = 0.005f;
+
+        Color linesColor;
+        linesColor.setHex(0xFFFFFF);  // White color for lines
+
+        std::vector<DrawSupport::PointInfo> vertices;
+
+        std::random_device rd;
+        std::mt19937 eng(rd());
+        std::uniform_int_distribution<> distr(0, 0xFFFFFF);
+        std::uniform_real_distribution<float> rndRange(-1.0f, 1.0f);
+
+        for (auto& face : halfedgeDS.getFaces()) {
+            face->calculateNormal();
+        }
+
+        auto loops = halfedgeDS.loops();
+        
+        for (auto& loop : loops) {
+            if (loop.empty()) continue;  // Skip empty loops
+
+            Color randomColor;
+            randomColor.setHex(distr(eng));
+
+            glm::vec3 firstPosition, lastPosition;
+            glm::vec3 lastRandomOffset(0.0f);
+            bool lastIsBoundary = false;  // Variable to track boundary state of the last halfedge
+            glm::vec3 start;
+            glm::vec3 start_first;
+
+            for (size_t i = 0; i < loop.size(); ++i) {
+                auto& he = loop[i];
+                if(i==0)
+                    start = he->vertex->position;
+
+                glm::vec3 end = he->twin->vertex->position;
+                glm::vec3 normal = he->face ? he->face->normal : glm::vec3(1, 0, 0);
+
+                glm::vec3 dir = glm::normalize(end - start);
+                glm::vec3 cross = glm::cross(normal, dir);
+
+                dir *= dirGapFactor;
+                normal *= normalGapFactor;
+                cross *= crossGapFactor;
+
+                float deltaMove=0.05;
+                glm::vec3 pos = start + normal + cross + dir;
+                glm::vec3 tip = end   + normal + cross - dir;//+glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));;
+
+                if(i==0)
+                {   
+                    start +=glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));
+                    end   +=glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));
+                    start_first=end;
+                    start=end;
+                  
+                    continue;
+                }
+                
+                if(he->isBoundary()) {
+                    //start +=glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));
+                    end   +=glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));
+                }
+
+            
+                if(he->isBoundary()) {
+                    vertices.push_back({start, randomColor.color});
+                    vertices.push_back({end,   randomColor.color});
+                }
+
+               
+
+                if(onlyBoundaryLines)
+                {   start=end;
+
+                    if(i== loop.size()-1)
+                    {
+                        if(he->isBoundary())
+                        {
+                            vertices.push_back({start, randomColor.color});
+                            vertices.push_back({start_first,   randomColor.color});
+                        }
+                    }
+                    continue;
+                }
+                else{
+                    vertices.push_back({start, linesColor.color});
+                    vertices.push_back({end,   linesColor.color});
+                }
+
+                start=end;
+
+                if(i== loop.size()-1)
+                {
+                    if(he->isBoundary()) {
+                        vertices.push_back({start, randomColor.color});
+                        vertices.push_back({start_first,   randomColor.color});
+                    }
+                }
+
+                if(!onlyBoundaryLines) {
+                    glm::vec3 arrowHeadLDir = glm::normalize(cross - dir) * arrowSize;
+                    glm::vec3 arrowHeadRDir = glm::normalize(-cross - dir) * arrowSize;
+
+                    vertices.push_back({pos, randomColor.color});
+                    vertices.push_back({tip, randomColor.color});
+
+                    // Add arrowheads
+                    vertices.push_back({tip, randomColor.color});
+                    vertices.push_back({tip + arrowHeadLDir, randomColor.color});
+                    vertices.push_back({tip, randomColor.color});
+                    vertices.push_back({tip + arrowHeadRDir, randomColor.color});
+                }
+                
+            }
+
+        }
+
+        return vertices;
+    }
+
 
 }
 

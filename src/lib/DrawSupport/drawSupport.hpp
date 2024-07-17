@@ -62,6 +62,8 @@ namespace DrawSupport {
     std::vector<DrawSupport::PointInfo> setHalgEdgesLines2(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines=false);
     std::vector<DrawSupport::PointInfo> setHalgEdgesLines3(HalfedgeDS& halfedgeDS);
 
+    std::vector<DrawSupport::PointInfo> setHalfEdgesLines4(HalfedgeDS &halfedgeDS, bool onlyBoundaryLines);
+
     //Tringulate 
 
     glm::vec3 calculateCentralPoint(const std::vector<Vertex *> &vertices);
