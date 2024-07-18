@@ -11,6 +11,7 @@
 
 #include <vector>
 #include <optional>
+#include <algorithm>
 
 
 #include "../Core/Vertex.hpp"
@@ -38,6 +39,10 @@ namespace Operations {
     void updateFaceReferences(Halfedge *start, Face *newFace);
 
     Vertex *splitEdgeRatio(HalfedgeDS &structDS, Halfedge *halfedge, float ratio, float tolerance= 1e-10);
+
+    //test functions
+    void processFaceRecursive(HalfedgeDS& halfedgeDS, Face* face, int numIterations);
+    void processFaceRecursiveOppositeEdges(HalfedgeDS& halfedgeDS, Face* face, int numIterations);
 
     class HalfedgeGenerator
     {

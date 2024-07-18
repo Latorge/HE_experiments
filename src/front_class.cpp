@@ -7,7 +7,7 @@ namespace HalfedgeLib {
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
        // auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
-        auto protoCube=Operations::generateQuadArrays(3,3,1.0);
+        auto protoCube=Operations::generateQuadArrays(3,3,5.0);
       //  auto protoCube=Operations::generateQuadArraysCube(35,35,5,1.0);
 /*
         for (auto& pos : protoCube.positions) {
@@ -49,7 +49,7 @@ namespace HalfedgeLib {
 */  
       // processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
        //  processRandomDeleteHalfedges(halfedgeDS01, 1, 0.075f);
-
+/*
         auto faceTemp= halfedgeDS01.getFace(0);
         auto vertexList=faceTemp->getVertices();
         //Operations::cutFace(halfedgeDS01, faceTemp,vertexList[0], vertexList[2], true);
@@ -58,6 +58,10 @@ namespace HalfedgeLib {
         auto newVertex2=Operations::splitEdgeRatio(halfedgeDS01, faceTemp->getHalfedges()[0], 0.5);
 
         Operations::cutFace(halfedgeDS01,faceTemp,newVertex,newVertex2, true);
+*/
+        auto faceTemp= halfedgeDS01.getFace(0);
+        //Operations::processFaceRecursive(halfedgeDS01, faceTemp, 5);
+        Operations::processFaceRecursiveOppositeEdges(halfedgeDS01, faceTemp, 11);
 
         std::cout<<"HEDS number faces: "<<halfedgeDS01.getFaces().size()<<std::endl;
         std::cout<<"HEDS number vertex: "<<halfedgeDS01.getVertices().size()<<std::endl;
@@ -72,7 +76,7 @@ namespace HalfedgeLib {
     std::vector<DrawSupport::PointInfo> FrontClass::getLinesfromHEDS(HalfedgeDS& halfedgeDS)
     {
         std::vector<DrawSupport::PointInfo> resultList;
-        resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, false);
+        resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, false, false);
         return resultList;
     }
 
@@ -135,6 +139,48 @@ namespace HalfedgeLib {
         // Remove the selected faces
         for (auto face : facesToRemove) {
             Operations::removeFace(halfedgeDS, face);
+        }
+    }
+
+    void FrontClass::processRandomFace(HalfedgeDS& halfedgeDS, int divideCoeff, float rndCoeff, 
+                           std::function<void(HalfedgeDS&, Face*, int)> func, int iterations) {
+        auto facesList = halfedgeDS.getFaces();
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(facesList.begin(), facesList.end(), g);
+        std::uniform_real_distribution<> dis(0.0, 1.0);
+        int limit = facesList.size() / divideCoeff;
+        std::vector<Face*> facesToProcess;
+
+        for (int i = 0; i < limit; ++i) {
+            if (dis(g) < rndCoeff) {
+                facesToProcess.push_back(facesList[i]);
+            }
+        }
+
+        for (auto face : facesToProcess) {
+            func(halfedgeDS, face, iterations);
+        }
+    }
+
+    template<typename Func, typename... Args>
+    void FrontClass::processRandomFaceT(HalfedgeDS& halfedgeDS, int divideCoeff, float rndCoeff, Func func, Args&&... args) {
+        auto facesList = halfedgeDS.getFaces();
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(facesList.begin(), facesList.end(), g);
+        std::uniform_real_distribution<> dis(0.0, 1.0);
+        int limit = facesList.size() / divideCoeff;
+        std::vector<Face*> facesToProcess;
+
+        for (int i = 0; i < limit; ++i) {
+            if (dis(g) < rndCoeff) {
+                facesToProcess.push_back(facesList[i]);
+            }
+        }
+
+        for (auto face : facesToProcess) {
+            std::invoke(func, halfedgeDS, face, std::forward<Args>(args)...);
         }
     }
 }

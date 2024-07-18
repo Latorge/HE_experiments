@@ -108,6 +108,7 @@ SET(Operations_SRC
     src/lib/Operations/removeFace.cpp
     src/lib/Operations/cutFace.cpp
     src/lib/Operations/splitEdge.cpp
+    src/lib/Operations/testFunctions.cpp
 )
 
 SET(main_INC

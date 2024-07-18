@@ -39,7 +39,7 @@ namespace DrawSupport {
     }
 
 
-    std::vector<DrawSupport::PointInfo> setHalfEdgesLines2(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines) {
+    std::vector<DrawSupport::PointInfo> setHalfEdgesLines2(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines, bool drawArrows) {
         const float arrowSize = 0.035f;
         const float crossGapFactor = 0.03f;
         const float dirGapFactor = 0.15f;
@@ -93,7 +93,7 @@ namespace DrawSupport {
                     vertices.push_back({end,   linesColor.color});
                 }
 
-                if(!onlyBoundaryLines) {
+                if(drawArrows) {
                     glm::vec3 arrowHeadLDir = glm::normalize(cross - dir) * arrowSize;
                     glm::vec3 arrowHeadRDir = glm::normalize(-cross - dir) * arrowSize;
 

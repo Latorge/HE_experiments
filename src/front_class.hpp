@@ -23,5 +23,8 @@ namespace HalfedgeLib {
             DrawSupport::GeometryData getTrianglesfromHEDS(HalfedgeDS &halfedgeDS);
             void processRandomDeleteHalfedges(HalfedgeDS &halfedgeDS, int divideCoeff, float rndCoeff);
             void processRandomDeleteFace(HalfedgeDS &halfedgeDS, int divideCoeff, float rndCoeff);
+            void processRandomFace(HalfedgeDS &halfedgeDS, int divideCoeff, float rndCoeff, std::function<void(HalfedgeDS &, Face *, int)> func, int iterations);
+            template <typename Func, typename... Args>
+            void processRandomFaceT(HalfedgeDS &halfedgeDS, int divideCoeff, float rndCoeff, Func func, Args &&...args);
     };
 }
