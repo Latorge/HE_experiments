@@ -3,7 +3,7 @@
 #include "iostream"
 #include "lib/Core/Struct.hpp"
 #include "lib/Operations/Operations.hpp"
-#include "lib/Operations/createOperations.hpp"
+#include "lib/CreateOperations/createOperations.hpp"
 #include "lib/DrawSupport/drawSupport.hpp"
 #include "lib/Core/HalfedgeDS.hpp"
 

@@ -94,7 +94,7 @@ SET(DrawSupport_SRC
 
 SET(Operations_INC
     src/lib/Operations/Operations.hpp
-    src/lib/Operations/createOperations.hpp
+    src/lib/CreateOperations/createOperations.hpp
 
 )
 SET(Operations_SRC
@@ -102,15 +102,17 @@ SET(Operations_SRC
     src/lib/Operations/addVertex.cpp
     src/lib/Operations/addEdge.cpp
     src/lib/Operations/setFromGeometry.cpp
-    src/lib/Operations/cubeCreater.cpp
-    src/lib/Operations/planeCreater.cpp
+
     src/lib/Operations/removeEdge.cpp
     src/lib/Operations/removeFace.cpp
     src/lib/Operations/removeVertex.cpp
     src/lib/Operations/cutFace.cpp
     src/lib/Operations/splitEdge.cpp
-    
+
     src/lib/Operations/testFunctions.cpp
+
+    src/lib/CreateOperations/cubeCreater.cpp
+    src/lib/CreateOperations/planeCreater.cpp
 )
 
 SET(main_INC
