@@ -7,8 +7,8 @@ namespace HalfedgeLib {
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
        // auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
-        auto protoCube=Operations::generateQuadArrays(3,3,5.0);
-      //  auto protoCube=Operations::generateQuadArraysCube(35,35,5,1.0);
+       //auto protoCube=Operations::generateQuadArrays(3,3,5.0);
+        auto protoCube=Operations::generateQuadArraysCube(5,5,5,3.0);
 /*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
@@ -61,7 +61,16 @@ namespace HalfedgeLib {
 */
         auto faceTemp= halfedgeDS01.getFace(0);
         //Operations::processFaceRecursive(halfedgeDS01, faceTemp, 5);
-        Operations::processFaceRecursiveOppositeEdges(halfedgeDS01, faceTemp, 11);
+        //Operations::processFaceRecursiveOppositeEdges(halfedgeDS01, faceTemp, 11);
+
+        processRandomFace(halfedgeDS01, 1, 0.95, Operations::processFaceRecursiveOppositeEdges, 1);
+        processRandomFace(halfedgeDS01, 1, 0.95, Operations::processFaceRecursiveOppositeEdges, 1);
+        processRandomFace(halfedgeDS01, 1, 0.95, Operations::processFaceRecursiveOppositeEdges, 2);
+        processRandomFace(halfedgeDS01, 1, 0.95, Operations::processFaceRecursiveOppositeEdges, 2);
+        processRandomFace(halfedgeDS01, 1, 0.95, Operations::processFaceRecursiveOppositeEdges, 2);
+
+        //processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
+        processRandomDeleteHalfedges(halfedgeDS01, 1, 0.055f);
 
         std::cout<<"HEDS number faces: "<<halfedgeDS01.getFaces().size()<<std::endl;
         std::cout<<"HEDS number vertex: "<<halfedgeDS01.getVertices().size()<<std::endl;
@@ -76,7 +85,7 @@ namespace HalfedgeLib {
     std::vector<DrawSupport::PointInfo> FrontClass::getLinesfromHEDS(HalfedgeDS& halfedgeDS)
     {
         std::vector<DrawSupport::PointInfo> resultList;
-        resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, false, false);
+        resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, true, false);
         return resultList;
     }
 
@@ -162,6 +171,7 @@ namespace HalfedgeLib {
             func(halfedgeDS, face, iterations);
         }
     }
+    //processRandomFace(halfedgeDS01, 10, 0.5, Operations::processFaceRecursiveOppositeEdges, 11);
 
     template<typename Func, typename... Args>
     void FrontClass::processRandomFaceT(HalfedgeDS& halfedgeDS, int divideCoeff, float rndCoeff, Func func, Args&&... args) {
@@ -183,4 +193,6 @@ namespace HalfedgeLib {
             std::invoke(func, halfedgeDS, face, std::forward<Args>(args)...);
         }
     }
+
+    //processRandomFace(halfedgeDS01, 10, 0.5, Operations::processFaceRecursiveOppositeEdges, 11);  // 11 as the iteration count
 }
