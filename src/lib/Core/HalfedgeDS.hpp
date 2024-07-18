@@ -41,8 +41,10 @@ public:
 
     // Methods to add components to the data structure
     Vertex* addVertexDirect(glm::vec3 position);
-    Vertex* addVertex(glm::vec3 position, bool checkDuplicates, float tolerance = 1e-10);
+    Vertex *addVertexFromPosition(glm::vec3 position, bool checkDuplicates, float tolerance= 1e-10);
+    
 
+    bool addVertex(Vertex *vertex);    
     bool removeHalfedge(Halfedge *halfedge);
     bool containsHalfedge(Halfedge *halfedge);
     bool removeFace(Face *face);

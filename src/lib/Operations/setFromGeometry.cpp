@@ -27,7 +27,7 @@ namespace Operations {
                 // Ensure vertices exist
                 Vertex* v1 = nullptr;
                 if (vertexMap.find(i1) == vertexMap.end()) {
-                    v1 = structure.addVertex(positions[i1], true);
+                    v1 = structure.addVertexFromPosition(positions[i1], true);
                     vertexMap[i1] = v1;
                 } else {
                     v1 = vertexMap[i1];
@@ -35,7 +35,7 @@ namespace Operations {
 
                 Vertex* v2 = nullptr;
                 if (vertexMap.find(i2) == vertexMap.end()) {
-                    v2 = structure.addVertex(positions[i2],true);
+                    v2 = structure.addVertexFromPosition(positions[i2],true);
                     vertexMap[i2] = v2;
                 } else {
                     v2 = vertexMap[i2];

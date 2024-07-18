@@ -98,7 +98,8 @@ namespace Operations {
 
         // Update face references and possibly create a new face
         bool isNewLoop = !isInSameLoop(h1, h2);
-        if (isNewLoop) {
+        if (isNewLoop)
+         {
             face->halfedge = h1;
             Face* newFace = nullptr;
             if (createNewFace) {

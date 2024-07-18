@@ -9,7 +9,7 @@ Vertex::Vertex(float x, float y, float z, int& _id) : position(glm::vec3(x, y, z
     halfedge  =   nullptr;
 }
 
-Vertex::Vertex(glm::vec3 vec, int& _id) : position(vec), id(_id){
+Vertex::Vertex(glm::vec3 vec, int _id) : position(vec), id(_id){
     halfedge  =   nullptr;
 }
 

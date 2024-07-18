@@ -65,7 +65,7 @@ Vertex* HalfedgeDS::addVertexDirect(glm::vec3 position) {
         return newVertex; // Return the ID then increment the counter
     }
 
-Vertex* HalfedgeDS::addVertex(glm::vec3 position, bool checkDuplicates, float tolerance)  {
+Vertex* HalfedgeDS::addVertexFromPosition(glm::vec3 position, bool checkDuplicates, float tolerance)  {
     if (checkDuplicates) {
         for (auto& vertex : getVertices()) {
             if (vertex->matchesPosition(position, tolerance)) {
@@ -78,6 +78,11 @@ Vertex* HalfedgeDS::addVertex(glm::vec3 position, bool checkDuplicates, float to
     return v;
 }
 
+bool HalfedgeDS::addVertex(Vertex *vertex) {
+  vertices.push_back(vertex);
+  vertex->id=vertexIDCounter;
+  return vertexIDCounter++;  // Return the ID then increment the counter
+}
 
 int HalfedgeDS::addFace(Face* face) {
     faces.push_back(face);

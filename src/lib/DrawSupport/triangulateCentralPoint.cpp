@@ -58,7 +58,7 @@ namespace DrawSupport {
         } else {
             // More complex polygon, use a fan triangulation
             glm::vec3 centralPoint = calculateCentralPoint(vertices);
-            for (int i = 1; i < vertices.size() - 1; ++i) {
+            for (int i = 0; i < vertices.size() - 1; ++i) {
                 addTriangleToData(data, centralPoint, vertices[i]->position, vertices[i + 1]->position, normal);
             }
             addTriangleToData(data, centralPoint, vertices.back()->position, vertices[0]->position, normal);

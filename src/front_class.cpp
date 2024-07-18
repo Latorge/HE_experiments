@@ -7,7 +7,7 @@ namespace HalfedgeLib {
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
        // auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
-        auto protoCube=Operations::generateQuadArrays(1,1,1.0);
+        auto protoCube=Operations::generateQuadArrays(3,3,1.0);
       //  auto protoCube=Operations::generateQuadArraysCube(35,35,5,1.0);
 /*
         for (auto& pos : protoCube.positions) {
@@ -48,9 +48,16 @@ namespace HalfedgeLib {
         Operations::removeFace(halfedgeDS01,faceExp3);
 */  
       // processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
-      //  processRandomDeleteHalfedges(halfedgeDS01, 1, 0.075f);
+       //  processRandomDeleteHalfedges(halfedgeDS01, 1, 0.075f);
 
-      Operations::cutFace(halfedgeDS01, halfedgeDS01.getFace(0),halfedgeDS01.getVertex(0), halfedgeDS01.getVertex(2), true);
+        auto faceTemp= halfedgeDS01.getFace(0);
+        auto vertexList=faceTemp->getVertices();
+        //Operations::cutFace(halfedgeDS01, faceTemp,vertexList[0], vertexList[2], true);
+
+        auto newVertex= Operations::splitEdgeRatio(halfedgeDS01, faceTemp->getHalfedges()[2], 0.5);
+        auto newVertex2=Operations::splitEdgeRatio(halfedgeDS01, faceTemp->getHalfedges()[0], 0.5);
+
+        Operations::cutFace(halfedgeDS01,faceTemp,newVertex,newVertex2, true);
 
         std::cout<<"HEDS number faces: "<<halfedgeDS01.getFaces().size()<<std::endl;
         std::cout<<"HEDS number vertex: "<<halfedgeDS01.getVertices().size()<<std::endl;

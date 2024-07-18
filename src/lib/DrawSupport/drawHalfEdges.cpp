@@ -60,19 +60,14 @@ namespace DrawSupport {
         }
 
         auto loops = halfedgeDS.loops();
-        
-     
         for (auto& loop : loops) {
-
-
             Color randomColor;
             randomColor.setHex(distr(eng));
-            int counter=0;
 
             for (auto& he : loop) {
                 glm::vec3 start = he->vertex->position;
                 glm::vec3 end = he->twin->vertex->position;
-                glm::vec3 normal = he->face ? he->face->normal : glm::vec3(1, 0, 0);
+                glm::vec3 normal = he->face ? he->face->normal :he->twin->face->normal;
 
                 glm::vec3 dir = glm::normalize(end - start);
                 glm::vec3 cross = glm::cross(normal, dir);
@@ -83,13 +78,7 @@ namespace DrawSupport {
 
                 float deltaMove=0.05;
                 glm::vec3 pos = start + normal + cross + dir;
-                glm::vec3 tip = end   + normal + cross - dir;//+glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));;
-
-                if(he->isBoundary()) {
-                    start +=glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));
-                    end   +=glm::vec3(deltaMove*rndRange(eng),deltaMove*rndRange(eng),deltaMove*rndRange(eng));
-                }
-
+                glm::vec3 tip = end   + normal + cross - dir;
             
                 if(he->isBoundary()) {
                     vertices.push_back({start, randomColor.color});
@@ -98,7 +87,8 @@ namespace DrawSupport {
 
                 if(onlyBoundaryLines)
                         continue;
-                else{
+
+                if(!he->isBoundary() && !he->twin->isBoundary()) {
                     vertices.push_back({start, linesColor.color});
                     vertices.push_back({end,   linesColor.color});
                 }
@@ -117,7 +107,6 @@ namespace DrawSupport {
                     vertices.push_back({tip + arrowHeadRDir, randomColor.color});
                 }
                 
-               counter++;
             }
         }
 

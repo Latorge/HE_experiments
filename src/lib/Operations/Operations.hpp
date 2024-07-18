@@ -37,6 +37,8 @@ namespace Operations {
     bool isInSameLoop(Halfedge *h1, Halfedge *h2);
     void updateFaceReferences(Halfedge *start, Face *newFace);
 
+    Vertex *splitEdgeRatio(HalfedgeDS &structDS, Halfedge *halfedge, float ratio, float tolerance= 1e-10);
+
     class HalfedgeGenerator
     {
         Vertex *vertex;
