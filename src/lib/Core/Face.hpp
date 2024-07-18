@@ -44,6 +44,7 @@ public:
     Vertex* vertexFromPosition(const glm::vec3& position, float tolerance) ;
     bool hasVertex(Vertex* vertex);
     std::vector<Vertex *> getVertices();
+    int calculateNumberVertex();
     std::vector<Halfedge *> getHalfedges();
     std::vector<Vertex *> commonVerticesWithVertex(Vertex *vertex);
     bool isNormalCalculated() const;

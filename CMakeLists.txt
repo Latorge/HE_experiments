@@ -95,6 +95,7 @@ SET(DrawSupport_SRC
 SET(Operations_INC
     src/lib/Operations/Operations.hpp
     src/lib/CreateOperations/createOperations.hpp
+    src/lib/Modificators/Modificators.hpp
 
 )
 SET(Operations_SRC
@@ -113,6 +114,9 @@ SET(Operations_SRC
 
     src/lib/CreateOperations/cubeCreater.cpp
     src/lib/CreateOperations/planeCreater.cpp
+
+    src/lib/Modificators/catmullClark.cpp
+    src/lib/Modificators/quadSubDivide.cpp
 )
 
 SET(main_INC

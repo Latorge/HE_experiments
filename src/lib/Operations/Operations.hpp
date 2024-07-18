@@ -35,11 +35,15 @@ namespace Operations {
     bool removeFace(HalfedgeDS& ds, Face* face);
     void removeVertex(HalfedgeDS& structDS, Vertex* vertex, bool mergeFaces = true);
 
-    Halfedge* cutFace(HalfedgeDS& structDS,Face* face, Vertex* v1, Vertex* v2, bool createNewFace);
+    Halfedge* cutFace(HalfedgeDS& structDS,Face* face, Vertex* v1, Vertex* v2, bool createNewFace=true);
     bool isInSameLoop(Halfedge *h1, Halfedge *h2);
     void updateFaceReferences(Halfedge *start, Face *newFace);
 
-    Vertex *splitEdgeRatio(HalfedgeDS &structDS, Halfedge *halfedge, float ratio, float tolerance= 1e-10);
+    
+
+    Vertex *splitEdgeRatio(HalfedgeDS &structDS, Halfedge *halfedge, float ratio, float tolerance = 1e-10);
+    Vertex *splitEdgeByPosition(HalfedgeDS &structDS, Halfedge *halfedge, const glm::vec3 &position, float tolerance= 1e-10);
+    Vertex *splitEdge(HalfedgeDS &structDS, Halfedge *halfedge); // split 50/50
 
     //test functions
     void processFaceRecursive(HalfedgeDS& halfedgeDS, Face* face, int numIterations);

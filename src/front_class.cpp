@@ -6,8 +6,8 @@ namespace HalfedgeLib {
 
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
-       // auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
-       auto protoCube=Operations::generateQuadArrays(5,5,1.0);
+        auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
+     //   auto protoCube=Operations::generateQuadArrays(3,3,1.0);
        // auto protoCube=Operations::generateQuadArraysCube(5,5,5,3.0);
 /*
         for (auto& pos : protoCube.positions) {
@@ -59,8 +59,13 @@ namespace HalfedgeLib {
 
         Operations::cutFace(halfedgeDS01,faceTemp,newVertex,newVertex2, true);
 */
-        auto faceTemp= halfedgeDS01.getFace(0);
-        auto vertexTemp= halfedgeDS01.getVertex(15);
+        //auto faceTemp= halfedgeDS01.getFace(0);
+        //auto vertexTemp= halfedgeDS01.getVertex(15);
+
+        Modificators::catmullClarkExp(halfedgeDS01);
+
+       // Modificators::quadSubDivideStruct(halfedgeDS01);
+
 
         //Operations::removeVertex(halfedgeDS01, vertexTemp);
 
@@ -89,7 +94,7 @@ namespace HalfedgeLib {
     std::vector<DrawSupport::PointInfo> FrontClass::getLinesfromHEDS(HalfedgeDS& halfedgeDS)
     {
         std::vector<DrawSupport::PointInfo> resultList;
-        resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, false, false);
+        resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, false, true);
         return resultList;
     }
 
@@ -99,6 +104,12 @@ namespace HalfedgeLib {
         resultList=DrawSupport::processTriangulateHalfedgeDS(halfedgeDS);
         return resultList;
     }
+
+    void FrontClass::quadSubDivideHEDS(HalfedgeDS& halfedgeDS)
+    {
+        Modificators::quadSubDivideStruct(halfedgeDS);
+    }
+
 
 
     void FrontClass::processRandomDeleteHalfedges(HalfedgeDS& halfedgeDS, int divideCoeff, float rndCoeff) {

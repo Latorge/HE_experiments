@@ -4,6 +4,7 @@
 #include "lib/Core/Struct.hpp"
 #include "lib/Operations/Operations.hpp"
 #include "lib/CreateOperations/createOperations.hpp"
+#include "lib/Modificators/Modificators.hpp"
 #include "lib/DrawSupport/drawSupport.hpp"
 #include "lib/Core/HalfedgeDS.hpp"
 
@@ -21,6 +22,7 @@ namespace HalfedgeLib {
             std::vector<DrawSupport::PointInfo> getLinesfromHEDS(HalfedgeDS& halfedgeDS);
 
             DrawSupport::GeometryData getTrianglesfromHEDS(HalfedgeDS &halfedgeDS);
+            void quadSubDivideHEDS(HalfedgeDS &halfedgeDS);
             void processRandomDeleteHalfedges(HalfedgeDS &halfedgeDS, int divideCoeff, float rndCoeff);
             void processRandomDeleteFace(HalfedgeDS &halfedgeDS, int divideCoeff, float rndCoeff);
             void processRandomFace(HalfedgeDS &halfedgeDS, int divideCoeff, float rndCoeff, std::function<void(HalfedgeDS &, Face *, int)> func, int iterations);

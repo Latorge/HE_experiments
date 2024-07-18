@@ -108,6 +108,22 @@ std::vector<Vertex*> Face::getVertices() {
     return vertices;
 }
 
+int Face::calculateNumberVertex()  // possible to add some cache
+{
+    std::vector<Vertex*> vertices;
+    if (!this->halfedge) return 0;  // return empty if no halfedges
+
+    Halfedge* start = this->halfedge;
+    Halfedge* currentHalfedge = start;
+
+    do {
+        vertices.push_back(currentHalfedge->vertex);
+        currentHalfedge = currentHalfedge->next;
+    } while (currentHalfedge != start);
+
+    return vertices.size();
+}
+
 std::vector<Halfedge*> Face::getHalfedges() {
     std::vector<Halfedge*> halfedges;
     if (!this->halfedge) return halfedges;  // return empty if no halfedges
