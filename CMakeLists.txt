@@ -106,8 +106,10 @@ SET(Operations_SRC
     src/lib/Operations/planeCreater.cpp
     src/lib/Operations/removeEdge.cpp
     src/lib/Operations/removeFace.cpp
+    src/lib/Operations/removeVertex.cpp
     src/lib/Operations/cutFace.cpp
     src/lib/Operations/splitEdge.cpp
+    
     src/lib/Operations/testFunctions.cpp
 )
 

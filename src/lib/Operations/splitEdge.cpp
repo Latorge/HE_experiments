@@ -1,6 +1,16 @@
 #include "Operations.hpp"
 
 namespace Operations {
+
+    /*
+     * From
+     *            A -------------- he -------------> B 
+     *            A <------------ twin ------------- B 
+     * To         
+     *            A --- he ------> v ---- newhe ---> B
+     *            A <-- newtwin -- v <----twin ----- B
+     */
+
     
     Vertex* splitEdgeRatio(HalfedgeDS &structDS, Halfedge *halfedge, float ratio, float tolerance)
     {

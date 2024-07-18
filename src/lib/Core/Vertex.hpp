@@ -25,10 +25,10 @@ public:
     void change(const glm::vec3& vector) ;
     void move(const glm::vec3& vector) ;
 
-    std::vector<Halfedge *> freeHalfedgesInLoop(Halfedge *start);
+    std::vector<Halfedge *> allHalfedgesInLoop(Halfedge *start = nullptr);
+    std::vector<Halfedge *> freeHalfedgesInLoop(Halfedge *start = nullptr);
 
     Halfedge* freeHalfedgesInLoopNext(Halfedge *start);
-
     Halfedge* findBoundaryHalfedge(Halfedge *halfIn, Halfedge *halfOut);
 
     std::vector<Halfedge *> collectBoundaryHalfedges();

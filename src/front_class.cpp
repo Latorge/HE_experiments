@@ -7,8 +7,8 @@ namespace HalfedgeLib {
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
        // auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
-       //auto protoCube=Operations::generateQuadArrays(3,3,5.0);
-        auto protoCube=Operations::generateQuadArraysCube(5,5,5,3.0);
+       auto protoCube=Operations::generateQuadArrays(5,5,1.0);
+       // auto protoCube=Operations::generateQuadArraysCube(5,5,5,3.0);
 /*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
@@ -60,18 +60,22 @@ namespace HalfedgeLib {
         Operations::cutFace(halfedgeDS01,faceTemp,newVertex,newVertex2, true);
 */
         auto faceTemp= halfedgeDS01.getFace(0);
+        auto vertexTemp= halfedgeDS01.getVertex(15);
+
+        //Operations::removeVertex(halfedgeDS01, vertexTemp);
+
         //Operations::processFaceRecursive(halfedgeDS01, faceTemp, 5);
         //Operations::processFaceRecursiveOppositeEdges(halfedgeDS01, faceTemp, 11);
-
+/*
         processRandomFace(halfedgeDS01, 1, 0.95, Operations::processFaceRecursiveOppositeEdges, 1);
         processRandomFace(halfedgeDS01, 1, 0.95, Operations::processFaceRecursiveOppositeEdges, 1);
         processRandomFace(halfedgeDS01, 1, 0.95, Operations::processFaceRecursiveOppositeEdges, 2);
         processRandomFace(halfedgeDS01, 1, 0.95, Operations::processFaceRecursiveOppositeEdges, 2);
         processRandomFace(halfedgeDS01, 1, 0.95, Operations::processFaceRecursiveOppositeEdges, 2);
 
-        //processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
-        processRandomDeleteHalfedges(halfedgeDS01, 1, 0.055f);
-
+        processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
+        processRandomDeleteHalfedges(halfedgeDS01, 1, 0.015f);
+*/
         std::cout<<"HEDS number faces: "<<halfedgeDS01.getFaces().size()<<std::endl;
         std::cout<<"HEDS number vertex: "<<halfedgeDS01.getVertices().size()<<std::endl;
         std::cout<<"HEDS number halfEdges: "<<halfedgeDS01.getHalfedges().size()<<std::endl;
@@ -85,7 +89,7 @@ namespace HalfedgeLib {
     std::vector<DrawSupport::PointInfo> FrontClass::getLinesfromHEDS(HalfedgeDS& halfedgeDS)
     {
         std::vector<DrawSupport::PointInfo> resultList;
-        resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, true, false);
+        resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, false, false);
         return resultList;
     }
 

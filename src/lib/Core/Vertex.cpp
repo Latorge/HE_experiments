@@ -25,7 +25,15 @@ void Vertex::move(const glm::vec3& vector) {
     position += vector;
 }
 
-std::vector<Halfedge*> Vertex::freeHalfedgesInLoop(Halfedge* start = nullptr) {
+std::vector<Halfedge*> Vertex::allHalfedgesInLoop(Halfedge* start) {
+     std::vector<Halfedge*> allHalfedges;
+        for (auto it =  beginCW(start); it != endCW(); ++it) {
+                allHalfedges.push_back((*it).twin);
+        }
+    return allHalfedges;
+}
+
+std::vector<Halfedge*> Vertex::freeHalfedgesInLoop(Halfedge* start) {
         std::vector<Halfedge*> freeHalfedges;
         for (auto it =  beginCW(start); it != endCW(); ++it) {
             if ((*it).twin && (*it).twin->isFree()) {

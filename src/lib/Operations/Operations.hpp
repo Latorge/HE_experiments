@@ -33,6 +33,7 @@ namespace Operations {
     bool makeHalfedgesAdjacent(Halfedge* halfIn, Halfedge* halfOut);
     void removeEdge(HalfedgeDS& ds, Halfedge* halfedge, bool mergeFaces = true);
     bool removeFace(HalfedgeDS& ds, Face* face);
+    void removeVertex(HalfedgeDS& structDS, Vertex* vertex, bool mergeFaces = true);
 
     Halfedge* cutFace(HalfedgeDS& structDS,Face* face, Vertex* v1, Vertex* v2, bool createNewFace);
     bool isInSameLoop(Halfedge *h1, Halfedge *h2);
