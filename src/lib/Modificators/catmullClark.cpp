@@ -3,7 +3,7 @@
 namespace Modificators {
 
 
-void catmullClarkExp(HalfedgeDS& structDS) {
+void catmullClarkExp2(HalfedgeDS& structDS) {
     auto newPositions = calculatePosBorder(structDS);
     auto faceVertexPos = calculateFaceVerticesPos(structDS);
     auto edgeVertexPos = calculateEdgeVerticesPos(structDS);
@@ -47,9 +47,9 @@ void catmullClarkExp(HalfedgeDS& structDS) {
     }
 
     // Process faces with 8 vertices
-    //processFaces(structDS, 8);
+    processFaces(structDS, 8);
     // Process faces with 6 vertices
-    //processFaces(structDS, 6);
+    processFaces(structDS, 6);
 
     // Re-mark all halfedges as not visited
     for (auto halfedge : structDS.getHalfedges()) {
@@ -100,13 +100,13 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
     }
 }
 
-    void catmullClarkExp2(HalfedgeDS& structDS) {
+    void catmullClarkExp(HalfedgeDS& structDS) {
         auto newPositions =  calculatePosBorder(structDS);
         auto faceVertexPos = calculateFaceVerticesPos(structDS);
         //auto edgeVertexPos = calculateEdgeVerticesPos(structDS);
 
         int vlen =structDS.getVertices().size();
- 
+ /*
         std::vector<std::pair<Halfedge*, glm::vec3>> markedEdges;
         for (auto halfEdge : structDS.getHalfedges()) {
 
@@ -126,10 +126,10 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
             markedEdges.push_back(std::make_pair(halfEdge, edgePoint));
         }
 
-
+*/
  // Update vertex positions
        
-/*
+
         std::vector<std::pair<Halfedge*, glm::vec3>> markedEdges;
         std::unordered_set<Halfedge*> visitedHalfedges;  // To track which halfedges have been processed
 
@@ -148,8 +148,8 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
 
                 // If halfEdge is connected to a face and so is its twin
                 if (halfEdge->face && halfEdge->twin->face) {
-                    glm::vec3 faceCenter1 = halfEdge->face->calculateCenterPoint();
-                    glm::vec3 faceCenter2 = halfEdge->twin->face->calculateCenterPoint();
+                    glm::vec3 faceCenter1 = faceVertexPos[halfEdge->face];//halfEdge->face->calculateCenterPoint();
+                    glm::vec3 faceCenter2 = faceVertexPos[halfEdge->twin->face];//halfEdge->twin->face->calculateCenterPoint();
                     edgePoint += faceCenter1 + faceCenter2;
                     edgePoint /= 4.0f;
                 } else {
@@ -161,7 +161,7 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
                // visitedHalfedges.insert(halfEdge->twin);
             }
         }
-*/
+
 
         for (auto halfEdgeInfo : markedEdges) {
             Operations::splitEdgeByPosition(structDS, halfEdgeInfo.first, halfEdgeInfo.second);
@@ -176,7 +176,7 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
         for (auto halfedge : structDS.getHalfedges()) {
             halfedge->visited = false;
         }
-
+/*
         std::vector<Face*> markedFaces;
         for (auto face : structDS.getFaces()) {
             if (face->getVertices().size()== 8) {
@@ -212,9 +212,9 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
             halfedge->visited = false;
         }
 
-
+*/
          //struct.loops();  // Assuming this function does some internal restructuring or cleanup
-/*
+
          std::vector<Face*> selectedFaces;
 
         // Collect faces with 8 vertices
@@ -226,6 +226,7 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
 
         float ratio = 0.5f;
         std::vector<Halfedge*> newHalfEdges;
+        markedEdges.clear();
 
         // Now process the collected faces
         for (auto& face : selectedFaces) {
@@ -244,12 +245,14 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
             if (newVertices.size() >= 2) {
                 Halfedge* newHalfEdge = Operations::cutFace(structDS, face, newVertices[0], newVertices[1]);
                 newHalfEdges.push_back(newHalfEdge);
+                markedEdges.emplace_back(newHalfEdge, faceVertexPos[face]);
             }
         }
 
         // Split edges at calculated mid-points
-        for (auto halfEdge : newHalfEdges) {
-            Operations::splitEdgeRatio(structDS, halfEdge, ratio);
+        for (auto halfEdge : markedEdges) {
+            //Operations::splitEdgeRatio(structDS, halfEdge, ratio);
+            Operations::splitEdgeByPosition(structDS, halfEdge.first, halfEdge.second);
         }
 
 
@@ -289,7 +292,7 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
             face->normalFlag = false;
             face->calculateNormal();
         }
-*/
+
 
     }
 
@@ -503,6 +506,126 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
         return edgeVerticesPosHash;
     }
 
+
+    std::vector<glm::vec3> calculatePosBorder2(HalfedgeDS &structDS)
+    {
+        const std::vector<Vertex*>  vertices = structDS.getVertices();
+        size_t vlen = vertices.size();
+        
+        // Copy existing positions
+        std::vector<glm::vec3> newPositions;
+        //newPositions.reserve(vlen);
+        for (auto vertex : vertices)
+        {
+            newPositions.emplace_back(vertex->position);
+        }
+
+        // Coefficients map
+        /*
+        std::unordered_map<int, glm::vec3> kmap;
+        for (int i = 1; i <= 32; ++i)
+        { // Start from 1 to avoid division by zero
+            float beta = 3.0f / (2.0f * i);
+            float rho = 1.0f / (4.0f * i);
+            kmap[i] = glm::vec3(1.0f - beta - rho, beta / i, rho / i);
+        }
+        */      
+
+        const float coeff6d8 = 6.0f / 8.0f;
+        const float coeff1d8 = 1.0f / 8.0f;
+
+
+        for (size_t i = 0; i < vlen; ++i)
+        {
+            Vertex* vertex = vertices[i];
+            std::vector<Halfedge*> neighbors = vertex->allHalfedgesInLoop();
+            size_t nlen = neighbors.size();
+
+            std::vector<Halfedge*> borderEdges;
+
+            Halfedge* startHalfEdge = vertex->halfedge;
+            if (!startHalfEdge)
+                continue;
+
+            Face* face = startHalfEdge->face ? startHalfEdge->face : startHalfEdge->twin->face;
+            if (!face)
+                continue;
+
+            for (auto currentHalfedge : neighbors)
+            {
+                if (!currentHalfedge->face || !currentHalfedge->twin->face){
+                    borderEdges.push_back(currentHalfedge);
+                }
+            }
+
+            glm::vec3 vertPoint = vertex->position;
+
+            if (borderEdges.size()== 1 || nlen == 1)
+            {
+                newPositions[i] = vertPoint;
+            }
+            else if (borderEdges.size() >= 2)
+            {
+                float tolerance = 0.0000001f; 
+                /*
+                glm::vec3 borderVert0 = borderEdges[0]->vertex->position;
+                if (borderVert0 == vertPoint)
+                    borderVert0 = borderEdges[0]->twin->vertex->position;
+
+                glm::vec3 borderVert1 = borderEdges[1]->twin->vertex->position;
+                if (borderVert1 == vertPoint)
+                    borderVert1 = borderEdges[1]->vertex->position;
+                    */
+/*
+                glm::vec3 borderVert0 = borderEdges[0]->vertex->position;
+                compareAndUpdate(borderVert0, vertPoint, borderEdges[0]->twin->vertex->position, tolerance);
+                glm::vec3 borderVert1 = borderEdges[1]->twin->vertex->position;
+                compareAndUpdate(borderVert1, vertPoint, borderEdges[1]->vertex->position, tolerance);
+*/
+/**/
+                glm::vec3 borderVert0 = borderEdges[0]->vertex->position;
+                glm::vec3 borderVert1 = borderEdges[1]->twin->vertex->position;
+
+                if (glm::all(glm::epsilonEqual(borderVert0, vertPoint, glm::vec3(0.000001f))))
+                    borderVert0 = borderEdges[0]->twin->vertex->position;
+                if (glm::all(glm::epsilonEqual(borderVert1, vertPoint, glm::vec3(0.000001f))))
+                    borderVert1 = borderEdges[1]->vertex->position;
+
+                vertPoint   *= coeff6d8;
+                borderVert0 *= coeff1d8;
+                borderVert1 *= coeff1d8;
+
+                vertPoint += borderVert0;
+                vertPoint += borderVert1;
+                newPositions[i] = vertPoint;
+            }
+            else
+            {
+                glm::vec3 neighborSum(0.0f);
+                glm::vec3 faceSum(0.0f);
+
+                for (auto currentHalfedge : neighbors)
+                {
+                    neighborSum += currentHalfedge->twin->vertex->position;
+                    Face* face2  = currentHalfedge->face ? currentHalfedge->face : currentHalfedge->twin->face;
+                    if (currentHalfedge->face)
+                        faceSum += face2->calculateCenterPoint();
+                }
+
+                float baseScalar = (nlen - 2.0f) / nlen;
+                float neighborScalar = 1.0f / (nlen * nlen);
+
+                vertPoint   *= baseScalar;
+                neighborSum *= neighborScalar;
+                faceSum     *= neighborScalar;
+
+                vertPoint += neighborSum;
+                vertPoint += faceSum;
+                newPositions[i] = vertPoint;
+            }
+        }
+        return newPositions;
+    }
 
 
 }   

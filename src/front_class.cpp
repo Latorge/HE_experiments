@@ -7,8 +7,8 @@ namespace HalfedgeLib {
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
         //auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
-        auto protoCube=Operations::generateQuadArrays(3,3,1.0);
-       // auto protoCube=Operations::generateQuadArraysCube(5,5,5,3.0);
+        auto protoCube=Operations::generateQuadArrays(11,11,1.0);
+        //auto protoCube=Operations::generateQuadArraysCube(5,5,5,3.0);
 /*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
@@ -47,7 +47,7 @@ namespace HalfedgeLib {
         auto faceExp3=halfedgeDS01.getFaces()[33];
         Operations::removeFace(halfedgeDS01,faceExp3);
 */  
-      // processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
+       processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
        //  processRandomDeleteHalfedges(halfedgeDS01, 1, 0.075f);
 /*
         auto faceTemp= halfedgeDS01.getFace(0);

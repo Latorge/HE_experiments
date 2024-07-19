@@ -6,11 +6,20 @@
 #include <set>
 #include <glm/glm.hpp>
 #include "Struct.hpp"
+#include <unordered_set>
 
 #include "Halfedge.hpp"
 
 class Vertex {
 public:
+
+    // Define a custom hash function if Halfedge pointers are not trivially hashable
+    struct HalfedgeHash {
+        std::size_t operator()(Halfedge* const& h) const noexcept {
+            return std::hash<std::uintptr_t>()(reinterpret_cast<std::uintptr_t>(h));
+        }
+    };
+
     glm::vec3 position;
     Halfedge* halfedge  =   nullptr;
     bool needUpdate     =   false;

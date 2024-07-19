@@ -24,13 +24,31 @@ void Vertex::change(const glm::vec3& vector) {
 void Vertex::move(const glm::vec3& vector) {
     position += vector;
 }
-
+/*
 std::vector<Halfedge*> Vertex::allHalfedgesInLoop(Halfedge* start) {
      std::vector<Halfedge*> allHalfedges;
         for (auto it =  beginCW(start); it != endCW(); ++it) {
-                //allHalfedges.push_back((*it).twin);
+                Halfedge* he = &(*it);
+               if(he->vertex==this)
                 allHalfedges.push_back(&(*it));
         }
+    return allHalfedges;
+}
+*/
+std::vector<Halfedge*> Vertex::allHalfedgesInLoop(Halfedge* start) {
+    std::unordered_set<Halfedge*, HalfedgeHash> uniqueHalfedges;  // Set to store unique halfedges
+    std::vector<Halfedge*> allHalfedges;  // Vector to return
+
+    for (auto it = beginCW(start); it != endCW(); ++it) {
+        Halfedge* he = &(*it);
+        if (he->vertex == this) {  // Ensure that only halfedges whose vertex is this vertex are considered
+            uniqueHalfedges.insert(he);  // Insert halfedge into set to ensure uniqueness
+        }
+    }
+
+    // Transfer unique halfedges from set to vector
+    allHalfedges.assign(uniqueHalfedges.begin(), uniqueHalfedges.end());
+
     return allHalfedges;
 }
 
@@ -196,6 +214,7 @@ float Vertex::calculateAngleWeight(Face* face, const glm::vec3& faceNormal, size
 }
 
  // Prefix increment
+
 Vertex::CWIterator& Vertex::CWIterator::operator++() {
      if (current && current->twin) {
         current = current->twin->next;
@@ -208,6 +227,8 @@ Vertex::CWIterator& Vertex::CWIterator::operator++() {
     }
     return *this;
 }
+
+
 
 // Postfix increment
 Vertex::CWIterator Vertex::CWIterator::operator++(int) {

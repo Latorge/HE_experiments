@@ -24,6 +24,7 @@ namespace Modificators {
     std::unordered_map<Face*, glm::vec3> calculateFaceVerticesPos(HalfedgeDS &structDS);
     std::unordered_map<Halfedge*, glm::vec3> calculateEdgeVerticesPos(HalfedgeDS &structDS);
 
+    std::vector<glm::vec3> calculatePosBorder2(HalfedgeDS &structDS);
 
     void quadSubDivideStruct(HalfedgeDS &structDS);
     void quadSubDivide(HalfedgeDS &structDS);
