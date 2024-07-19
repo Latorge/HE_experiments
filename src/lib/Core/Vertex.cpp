@@ -28,7 +28,8 @@ void Vertex::move(const glm::vec3& vector) {
 std::vector<Halfedge*> Vertex::allHalfedgesInLoop(Halfedge* start) {
      std::vector<Halfedge*> allHalfedges;
         for (auto it =  beginCW(start); it != endCW(); ++it) {
-                allHalfedges.push_back((*it).twin);
+                //allHalfedges.push_back((*it).twin);
+                allHalfedges.push_back(&(*it));
         }
     return allHalfedges;
 }

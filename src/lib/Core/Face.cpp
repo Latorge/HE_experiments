@@ -27,13 +27,24 @@ glm::vec3 Face::calculateCenterPoint() {
     int count = 0;
     auto start = halfedge;
     auto current = start;
-
+/*
     do {
         sum += current->vertex->position;
         count++;
         //current = current->next;
     } while (current != start);
+*/
 
+    auto vertices=this->getVertices();
+    for(const auto vertex:vertices)
+    {
+        sum += vertex->position;
+        count++;
+    }
+    if(count==0)
+    {
+        return glm::vec3(0.0f);
+    }
     centerPoint = sum / static_cast<float>(count);
     return centerPoint;
 }

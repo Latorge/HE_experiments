@@ -6,8 +6,8 @@ namespace HalfedgeLib {
 
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
-        auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
-     //   auto protoCube=Operations::generateQuadArrays(3,3,1.0);
+        //auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
+        auto protoCube=Operations::generateQuadArrays(3,3,1.0);
        // auto protoCube=Operations::generateQuadArraysCube(5,5,5,3.0);
 /*
         for (auto& pos : protoCube.positions) {
@@ -62,7 +62,10 @@ namespace HalfedgeLib {
         //auto faceTemp= halfedgeDS01.getFace(0);
         //auto vertexTemp= halfedgeDS01.getVertex(15);
 
+       
         Modificators::catmullClarkExp(halfedgeDS01);
+       // Modificators::catmullClarkExp(halfedgeDS01);
+       //   Modificators::catmullClarkExp(halfedgeDS01);
 
        // Modificators::quadSubDivideStruct(halfedgeDS01);
 
@@ -107,7 +110,8 @@ namespace HalfedgeLib {
 
     void FrontClass::quadSubDivideHEDS(HalfedgeDS& halfedgeDS)
     {
-        Modificators::quadSubDivideStruct(halfedgeDS);
+        //Modificators::quadSubDivideStruct(halfedgeDS);
+         Modificators::catmullClarkExp(halfedgeDS01);
     }
 
 
