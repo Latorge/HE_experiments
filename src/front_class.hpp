@@ -19,10 +19,11 @@ namespace HalfedgeLib {
             HalfedgeDS halfedgeDS01;
 
             void testCube(HalfedgeDS& halfedgeDS);
-            std::vector<DrawSupport::PointInfo> getLinesfromHEDS(HalfedgeDS& halfedgeDS);
+            std::vector<DrawSupport::PointInfo> getLinesfromHEDS(HalfedgeDS &halfedgeDS, bool onlyBoundaryLines, bool drawArrows);
 
             DrawSupport::GeometryData getTrianglesfromHEDS(HalfedgeDS &halfedgeDS);
             void quadSubDivideHEDS(HalfedgeDS &halfedgeDS);
+            void randomDeleteFaces(HalfedgeDS &halfedgeDS, float rndCoeff);
             void processRandomDeleteHalfedges(HalfedgeDS &halfedgeDS, int divideCoeff, float rndCoeff);
             void processRandomDeleteFace(HalfedgeDS &halfedgeDS, int divideCoeff, float rndCoeff);
             void processRandomFace(HalfedgeDS &halfedgeDS, int divideCoeff, float rndCoeff, std::function<void(HalfedgeDS &, Face *, int)> func, int iterations);

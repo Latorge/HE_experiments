@@ -27,7 +27,7 @@ void Vertex::move(const glm::vec3& vector) {
 
 std::vector<Halfedge*> Vertex::allHalfedgesInLoop(Halfedge* start) {
      std::vector<Halfedge*> allHalfedges;
-        for (auto it =  beginCW(start); it != endCW(); ++it) {
+        for (auto it =  beginCW(start); it != endCW(); --it) {
                 allHalfedges.push_back(*it);
                  std::cout << "Halfedge at: " << (*it)->getId() <<std::endl;
 
@@ -82,7 +82,7 @@ std::vector<Halfedge*> Vertex::allHalfedgesInLoop(Halfedge* start) {
 */
 std::vector<Halfedge*> Vertex::freeHalfedgesInLoop(Halfedge* start) {
         std::vector<Halfedge*> freeHalfedges;
-        for (auto it =  beginCW(start); it != endCW(); --it) {
+        for (auto it =  beginCW(start); it != endCW(); ++it) {
             if ((*it)->twin && (*it)->twin->isFree()) {
                 freeHalfedges.push_back((*it)->twin);
                
@@ -99,12 +99,12 @@ Halfedge* Vertex::freeHalfedgesInLoopNext(Halfedge* start) {
     if (!start) start = this->halfedge; // Use the vertex's halfedge if no start is provided
     int count = 0;  // Counter to find the second free halfedge
     // Iterate over the halfedges in a clockwise direction
-    for (auto it =  beginCW(start); it != endCW(); --it) {
+    for (auto it =  beginCW(start); it != endCW(); ++it) {
         // Check if the twin of the current halfedge exists and is free
        // if ((*it)->twin && (*it)->twin->isFree()) {
         if ((*it)->twin && (*it)->twin->isFree()) {
             count++;
-            if (count == 1) {
+            if (count == 2) {
                 return (*it)->twin; // Return the second free halfedge if found
             }
         }
@@ -181,7 +181,7 @@ Halfedge* Vertex::getHalfedgeToVertex(Vertex* other) {
     if(!this->halfedge)
         return nullptr;
     // Use the CWIterator to iterate over the halfedges in a clockwise direction
-    for (auto it = beginCW(); it != endCW(); it--) {
+    for (auto it = beginCW(); it != endCW(); ++it) {
         // Check if the twin of the current halfedge points to the other vertex
         if ((*it)->twin && (*it)->twin->vertex == other) {
             return  it.getHE();//&(*it);
@@ -214,7 +214,7 @@ glm::vec3 Vertex::calculateVertexNormal() {
     std::set<Face*> sharedFaces;
 
     // Collect faces that share this vertex
-    for (auto it = beginCW(); it != endCW(); ++it) {
+    for (auto it = beginCW(); it != endCW(); --it) {
         if ((*it)->face) {
             sharedFaces.insert((*it)->face);
         }
@@ -304,10 +304,13 @@ Halfedge* Vertex::CWIterator::getHE() {return current;}
 
 Vertex::CWIterator Vertex::beginCW(Halfedge* start){
         start=start ? start : this->halfedge;
+        
          if (!start) {  // Check if start is still nullptr
             std::cerr << "Error: start halfedge is nullptr." << std::endl;
-            throw std::runtime_error("Start halfedge is nullptr.");
+            //throw std::runtime_error("Start halfedge is nullptr.");
+            return CWIterator(nullptr, false);
         }
+        
         std::cout << "Starting iteration. start is :"<<start->getId() << std::endl; 
         return CWIterator(start, true);
 }
