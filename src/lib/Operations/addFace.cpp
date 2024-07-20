@@ -22,7 +22,7 @@ namespace Operations {
             }
 
             if (curr->twin->vertex != next->vertex) {
-                throw std::runtime_error("Halfedges do not form a chain");
+               throw std::runtime_error("Halfedges do not form a chain");
             }
         }
 

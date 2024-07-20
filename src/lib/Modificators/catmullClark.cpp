@@ -266,6 +266,7 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
         }
 
         newHalfEdges.clear();
+        markedEdges.clear();
 
         // Process the collected faces
         for (auto& face : selectedFaces) {
@@ -340,14 +341,14 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
         for (size_t i = 0; i < vlen; ++i)
         {
             Vertex* vertex = vertices[i];
-            std::vector<Halfedge*> neighbors = vertex->allHalfedgesInLoop();
+            std::vector<Halfedge*> neighbors = vertex-> allHalfedgesInLoopExp();
             size_t nlen = neighbors.size();
 
             std::vector<Halfedge*> borderEdges;
 
             Halfedge* startHalfEdge = vertex->halfedge;
-            if (!startHalfEdge)
-                continue;
+           // if (!startHalfEdge)
+            //    continue;
 
             Face* face = startHalfEdge->face ? startHalfEdge->face : startHalfEdge->twin->face;
             if (!face)

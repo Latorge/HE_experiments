@@ -7,8 +7,11 @@ namespace HalfedgeLib {
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
         //auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
-        auto protoCube=Operations::generateQuadArrays(11,11,1.0);
-        //auto protoCube=Operations::generateQuadArraysCube(5,5,5,3.0);
+        //auto protoCube=Operations::generateQuadArrays(1,1,1.0);
+        //auto protoCube=Operations::generateQuadArrays(3,3,1.0);
+
+        //auto protoCube=Operations::generateQuadArrays(11,11,1.0);
+        auto protoCube=Operations::generateQuadArraysCube(15,15,15,1.0);
 /*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
@@ -47,7 +50,7 @@ namespace HalfedgeLib {
         auto faceExp3=halfedgeDS01.getFaces()[33];
         Operations::removeFace(halfedgeDS01,faceExp3);
 */  
-       processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
+     //  processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
        //  processRandomDeleteHalfedges(halfedgeDS01, 1, 0.075f);
 /*
         auto faceTemp= halfedgeDS01.getFace(0);
@@ -60,10 +63,21 @@ namespace HalfedgeLib {
         Operations::cutFace(halfedgeDS01,faceTemp,newVertex,newVertex2, true);
 */
         //auto faceTemp= halfedgeDS01.getFace(0);
-        //auto vertexTemp= halfedgeDS01.getVertex(15);
+        auto vertexTemp= halfedgeDS01.getVertex(0);
+        std::vector<Halfedge*> neighbors = vertexTemp->allHalfedgesInLoop();
+        std::vector<Halfedge*> neighbors3 = vertexTemp->allHalfedgesInLoopExp();
+        std::vector<Halfedge*> neighbors2 = vertexTemp->allOutgoingHalfedges();
+
+        std::cout<<"number neibors: "<<neighbors.size()<<std::endl;
+        std::cout<<"number neibors: "<<neighbors3.size()<<std::endl;
+        std::cout<<"number neibors outgoing: "<<neighbors2.size()<<std::endl;
+
+       // auto commonFaces=vertexTemp->commonFacesWithVertex();
+      //  std::cout<<"numbercommon faces: "<<commonFaces.size()<<std::endl;
+
 
        
-        Modificators::catmullClarkExp(halfedgeDS01);
+       // Modificators::catmullClarkExp(halfedgeDS01);
        // Modificators::catmullClarkExp(halfedgeDS01);
        //   Modificators::catmullClarkExp(halfedgeDS01);
 

@@ -35,6 +35,8 @@ public:
     void move(const glm::vec3& vector) ;
 
     std::vector<Halfedge *> allHalfedgesInLoop(Halfedge *start = nullptr);
+    std::vector<Halfedge *> allHalfedgesInLoopExp(Halfedge *start= nullptr);
+    std::vector<Halfedge *> allOutgoingHalfedges(Halfedge *start = nullptr);
     std::vector<Halfedge *> freeHalfedgesInLoop(Halfedge *start = nullptr);
 
     Halfedge* freeHalfedgesInLoopNext(Halfedge *start);
@@ -56,29 +58,35 @@ public:
 
     class CWIterator {
     private:
-        Halfedge* start;
         Halfedge* current;
+        Halfedge* start;
         bool firstPass;
-
+        bool secondPass;
     public:
+
         using iterator_category = std::forward_iterator_tag;
         using value_type = Halfedge;
         using difference_type = std::ptrdiff_t;
         using pointer = Halfedge*;
         using reference = Halfedge&;
 
-        CWIterator(Halfedge* start, bool isFirst = true) : start(start), current(start), firstPass(isFirst) {}
+        CWIterator(Halfedge* start, bool isFirst = true) : start(start), current(start),
+         firstPass(isFirst), secondPass(isFirst) {}
 
-        reference operator*() const { return *current; }
+        //reference operator*() const { return current; }
+        pointer operator*() const { return current; }
         pointer operator->() { return current; }
 
         // Prefix increment
         CWIterator& operator++();
+        CWIterator& operator--();
 
         // Postfix increment
         CWIterator operator++(int);
+        CWIterator operator--(int);
 
         bool hasNext() const;
+        Halfedge* getHE();
 
         Halfedge* next();
 
@@ -93,8 +101,8 @@ public:
         }
     };
 
-    CWIterator beginCW(Halfedge* start = nullptr) { return CWIterator(start ? start : halfedge); }
-    CWIterator endCW() { return CWIterator(nullptr, false); }
+    CWIterator beginCW(Halfedge* start = nullptr);
+    CWIterator endCW();
 
     class CCWIterator {
     private:
@@ -114,6 +122,8 @@ public:
         reference operator*() const { return *current; }
         pointer operator->() { return current; }
 
+ 
+
         // Prefix decrement
         CCWIterator& operator--();
 
@@ -126,11 +136,9 @@ public:
         friend bool operator!=(const CCWIterator& a, const CCWIterator& b) {
             return a.current != b.current;
         }
+        
     };
-
-    CCWIterator beginCCW(Halfedge* start = nullptr) { return CCWIterator(start ? start : halfedge); }
-    CCWIterator endCCW() { return CCWIterator(nullptr, false); }
-
+ 
 private:
    
     float calculateAngleWeight(Face *face, const glm::vec3 &faceNormal, size_t numCommonVertices);
