@@ -2,7 +2,6 @@
 
 namespace Modificators {
    
-
     Face* extrudeFace(HalfedgeDS& structDS, Face* face, float distExtrude, float amountExtrude) {
         glm::vec3 faceNormal = face->getNormal(false);
         glm::vec3 faceCenter = face->calculateCenterPoint();
