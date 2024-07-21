@@ -29,7 +29,7 @@ public:
     int id;
     std::vector<int> sub_id;
 
-    Face(Halfedge* he, int _id) ;
+    Face(Halfedge* he, int _id=-1) ;
 
     glm::vec3 getNormal(bool useNormalFlag=false);
     void calculateNormal();
@@ -43,10 +43,10 @@ public:
 
     Vertex* vertexFromPosition(const glm::vec3& position, float tolerance) ;
     bool hasVertex(Vertex* vertex);
-    std::vector<Vertex *> getVertices();
+    std::vector<Vertex*> getVertices();
     int calculateNumberVertex();
-    std::vector<Halfedge *> getHalfedges();
-    std::vector<Vertex *> commonVerticesWithVertex(Vertex *vertex);
+    std::vector<Halfedge*> getHalfedges();
+    std::vector<Vertex*> commonVerticesWithVertex(Vertex *vertex);
     bool isNormalCalculated() const;
     // Additional methods would be translated similarly
 };

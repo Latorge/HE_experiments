@@ -84,16 +84,37 @@ bool HalfedgeDS::addVertex(Vertex *vertex) {
   return vertexIDCounter++;  // Return the ID then increment the counter
 }
 
-int HalfedgeDS::addFace(Face* face) {
-    faces.push_back(face);
-    face->id=faceIDCounter;
-    return faceIDCounter++;  // Return the ID then increment the counter
+Vertex* HalfedgeDS::addVertex(glm::vec3 position) {
+  Vertex *vertex =new Vertex(position);
+  vertices.push_back(vertex);
+  vertex->id=vertexIDCounter;
+  return vertex;  // Return the ID then increment the counter
 }
 
 int HalfedgeDS::addHalfedge(Halfedge* halfedge) {
     halfedges.push_back(halfedge);
     halfedge->id=halfedgeIDCounter;
     return halfedgeIDCounter++;  // Return the ID then increment the counter
+}
+
+Halfedge* HalfedgeDS::addHalfedge(Vertex* vertex) {
+    Halfedge* halfEdge=new Halfedge(vertex);
+    halfedges.push_back(halfEdge);
+    halfEdge->id=halfedgeIDCounter;
+    return halfEdge;
+}
+
+int HalfedgeDS::addFace(Face* face) {
+    faces.push_back(face);
+    face->id=faceIDCounter;
+    return faceIDCounter++;  // Return the ID then increment the counter
+}
+
+Face* HalfedgeDS::addFace(Halfedge* halfedge) {
+    Face* face=new Face(halfedge);
+    faces.push_back(face);
+    face->id=faceIDCounter;
+    return face;  // Return the ID then increment the counter
 }
 
 // Method to remove a halfedge from the vector

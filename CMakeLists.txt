@@ -117,6 +117,7 @@ SET(Operations_SRC
 
     src/lib/Modificators/catmullClark.cpp
     src/lib/Modificators/quadSubDivide.cpp
+    src/lib/Modificators/extrudeFace.cpp
 )
 
 SET(main_INC

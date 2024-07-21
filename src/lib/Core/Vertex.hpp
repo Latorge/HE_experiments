@@ -26,9 +26,9 @@ public:
     int subGroup        = -1;
     int id;
 
-    Vertex(int& _id);
-    Vertex(float x, float y, float z, int& _id);
-    Vertex(glm::vec3 vec, int _id);
+    Vertex(int _id=-1);
+    Vertex(float x, float y, float z, int _id=-1);
+    Vertex(glm::vec3 _position, int _id=-1);
 
     void changeComponent(float x, float y, float z) ;
     void change(const glm::vec3& vector) ;

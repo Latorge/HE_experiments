@@ -1,15 +1,15 @@
 #include "Vertex.hpp"
 
 
-Vertex::Vertex(int& _id) : position(glm::vec3(0.0, 0.0, 0.0)), id(_id) {
+Vertex::Vertex(int _id) : position(glm::vec3(0.0, 0.0, 0.0)), id(_id) {
      halfedge  =   nullptr;
 }
 
-Vertex::Vertex(float x, float y, float z, int& _id) : position(glm::vec3(x, y, z)), id(_id){
+Vertex::Vertex(float x, float y, float z, int _id) : position(glm::vec3(x, y, z)), id(_id){
     halfedge  =   nullptr;
 }
 
-Vertex::Vertex(glm::vec3 vec, int _id) : position(vec), id(_id){
+Vertex::Vertex(glm::vec3 _position, int _id) : position(_position), id(_id){
     halfedge  =   nullptr;
 }
 

@@ -10,8 +10,8 @@ namespace HalfedgeLib {
         //auto protoCube=Operations::generateQuadArrays(1,1,1.0);
         //auto protoCube=Operations::generateQuadArrays(3,3,1.0);
 
-        auto protoCube=Operations::generateQuadArrays(11,11,1.0);
-       // auto protoCube=Operations::generateQuadArraysCube(5,5,5,1.0);
+       // auto protoCube=Operations::generateQuadArrays(11,11,1.0);
+        auto protoCube=Operations::generateQuadArraysCube(5,5,5,1.0);
 /*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
@@ -50,8 +50,8 @@ namespace HalfedgeLib {
         auto faceExp3=halfedgeDS01.getFaces()[33];
         Operations::removeFace(halfedgeDS01,faceExp3);
 */  
-       processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
-       halfedgeDS01.removeFreeVertices();
+       //processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
+       //halfedgeDS01.removeFreeVertices();
        //  processRandomDeleteHalfedges(halfedgeDS01, 1, 0.075f);
 /*
         auto faceTemp= halfedgeDS01.getFace(0);
@@ -63,7 +63,10 @@ namespace HalfedgeLib {
 
         Operations::cutFace(halfedgeDS01,faceTemp,newVertex,newVertex2, true);
 */
+
         //auto faceTemp= halfedgeDS01.getFace(0);
+        //Modificators::extrudeFace(halfedgeDS01,faceTemp, 1.1f,0.5f);
+        
         auto vertexTemp= halfedgeDS01.getVertex(8);
         std::vector<Halfedge*> neighbors = vertexTemp->allHalfedgesInLoop();
         std::cout<<"--------------------"<<std::endl;
@@ -75,7 +78,7 @@ namespace HalfedgeLib {
         std::cout<<"number neibors: "<<neighbors.size()<<std::endl;
         std::cout<<"number neibors: "<<neighbors3.size()<<std::endl;
         std::cout<<"number neibors outgoing: "<<neighbors2.size()<<std::endl;
-
+/*
         {   
             HalfedgeDS halfedgeDS02=halfedgeDS01;
             //auto faceTemp= halfedgeDS01.getFace(0);
@@ -96,7 +99,7 @@ namespace HalfedgeLib {
             std::cout<<"HEDS2 number vertex: "<<halfedgeDS02.getVertices().size()<<std::endl;
             std::cout<<"HEDS2 number halfEdges: "<<halfedgeDS02.getHalfedges().size()<<std::endl;
         }
-        
+*/
        // auto commonFaces=vertexTemp->commonFacesWithVertex();
       //  std::cout<<"numbercommon faces: "<<commonFaces.size()<<std::endl;
 
@@ -133,30 +136,43 @@ namespace HalfedgeLib {
        // auto edge1=Operations::addEdge(halfedgeDS,v1,v2);
     }
 
-    std::vector<DrawSupport::PointInfo> FrontClass::getLinesfromHEDS(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines, bool drawArrows)
-    {
+    std::vector<DrawSupport::PointInfo> FrontClass::getLinesfromHEDS(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines, bool drawArrows){
         std::vector<DrawSupport::PointInfo> resultList;
         resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, onlyBoundaryLines, drawArrows);
         return resultList;
     }
 
-    DrawSupport::GeometryData FrontClass::getTrianglesfromHEDS(HalfedgeDS& halfedgeDS)
-    {
+    DrawSupport::GeometryData FrontClass::getTrianglesfromHEDS(HalfedgeDS& halfedgeDS){
         DrawSupport::GeometryData resultList;
         resultList=DrawSupport::processTriangulateHalfedgeDS(halfedgeDS);
         return resultList;
     }
 
-    void FrontClass::quadSubDivideHEDS(HalfedgeDS& halfedgeDS)
-    {
-        //Modificators::quadSubDivideStruct(halfedgeDS);
+    void FrontClass::quadSubDivideHEDS(HalfedgeDS& halfedgeDS){
+        Modificators::quadSubDivideStruct(halfedgeDS);
+    }
+
+
+    void FrontClass::catmullClarkHEDS(HalfedgeDS& halfedgeDS){
          Modificators::catmullClarkExp(halfedgeDS01);
     }
 
+    void FrontClass::processFaceRecursiveOppositeEdges(HalfedgeDS& halfedgeDS,float rndCoeff, int recursiveDepth){
+        processRandomFace(halfedgeDS01, 1, rndCoeff, Operations::processFaceRecursiveOppositeEdges, recursiveDepth);
+        halfedgeDS01.removeFreeVertices();
+    }
+
+
     //processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
-    void FrontClass::randomDeleteFaces(HalfedgeDS& halfedgeDS, float rndCoeff)
-    {
+    void FrontClass::randomDeleteFaces(HalfedgeDS& halfedgeDS, float rndCoeff){
        processRandomDeleteFace(halfedgeDS, 1, rndCoeff);
+       halfedgeDS01.removeFreeVertices();
+    }
+
+     //processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
+    void FrontClass::randomExtrudeFaces(HalfedgeDS& halfedgeDS, float rndCoeff, float distExtrude, float amountExtrude){
+       processRandomFaceT(halfedgeDS, 1, rndCoeff, Modificators::extrudeFace, distExtrude, amountExtrude);
+       //halfedgeDS01.removeFreeVertices();
     }
 
 

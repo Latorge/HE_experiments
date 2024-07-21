@@ -43,15 +43,22 @@ public:
     // Methods to add components to the data structure
     Vertex* addVertexDirect(glm::vec3 position);
     Vertex *addVertexFromPosition(glm::vec3 position, bool checkDuplicates, float tolerance= 1e-10);
+
+    bool containsHalfedge(Halfedge *halfedge); 
     
-    bool addVertex(Vertex *vertex);    
-    bool removeHalfedge(Halfedge *halfedge);
-    bool containsHalfedge(Halfedge *halfedge);
-    bool removeFace(Face *face);
+    bool addVertex(Vertex *vertex);
+    Vertex *addVertex(glm::vec3 position);
+
+    int addHalfedge(Halfedge *halfedge);
+    Halfedge *addHalfedge(Vertex *vertex);
+
+    int addFace(Face *face);
+    Face *addFace(Halfedge *halfedge);
+
     bool removeVertex(Vertex *vertex);
-    
-    int addFace(Face* face);
-    int addHalfedge(Halfedge* halfedge);
+    bool removeHalfedge(Halfedge *halfedge);
+    bool removeFace(Face *face);
+
 
     // Accessor methods
     Vertex*   getVertex(int index) const { return vertices[index]; }

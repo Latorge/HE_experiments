@@ -3,7 +3,8 @@
 Face::Face(Halfedge*  _he, int _id)  : halfedge(_he), id(_id), normalFlag(false) {}
 
 glm::vec3 Face::getNormal(bool useNormalFlag) {
-    if (!normalFlag && useNormalFlag) {
+    //if (!normalFlag && useNormalFlag)
+    {
         auto prevPos = halfedge->prev->vertex->position;
         auto currentPos = halfedge->vertex->position;
         auto nextPos = halfedge->next->vertex->position;
