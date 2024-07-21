@@ -136,6 +136,26 @@ namespace HalfedgeLib {
        // auto edge1=Operations::addEdge(halfedgeDS,v1,v2);
     }
 
+    void FrontClass::intersectionAABB(HalfedgeDS& halfedgeDS){
+        DrawSupport::GeometryData resultList;
+        resultList=DrawSupport::processTriangulateHalfedgeDS(halfedgeDS);
+
+        intersections::TriangleMeshAABB mesh;
+        // Suppose this is your buffer of glm::vec3 points:
+        std::vector<glm::vec3> points = resultList.vertices;
+        mesh.addTrianglesFromBuffer(points);
+
+        // Example query
+        intersections::Kernel::Ray_3 ray_query(intersections::Point(1.0, 0.0, 0.0), intersections::Point(0.0, 1.0, 0.0));
+        std::cout << mesh.countIntersections(ray_query) << " intersection(s) with ray query" << std::endl;
+
+        intersections::Point point_query(2.0, 2.0, 2.0);
+        std::cout << "Closest point is: " << mesh.closestPoint(point_query) << std::endl;
+        std::cout << "Squared distance: " << mesh.squaredDistance(point_query) << std::endl;
+        
+    }
+
+
     std::vector<DrawSupport::PointInfo> FrontClass::getLinesfromHEDS(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines, bool drawArrows){
         std::vector<DrawSupport::PointInfo> resultList;
         resultList=DrawSupport::setHalfEdgesLines2(halfedgeDS, onlyBoundaryLines, drawArrows);
@@ -149,7 +169,8 @@ namespace HalfedgeLib {
     }
 
     void FrontClass::quadSubDivideHEDS(HalfedgeDS& halfedgeDS){
-        Modificators::quadSubDivideStruct(halfedgeDS);
+        //Modificators::quadSubDivideStruct(halfedgeDS);
+        intersectionAABB(halfedgeDS);
     }
 
 

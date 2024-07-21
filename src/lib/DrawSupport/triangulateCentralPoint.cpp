@@ -19,7 +19,7 @@ namespace DrawSupport {
         data.vertices.push_back(p3);
 
         // Add the same color for all vertices (change as needed)
-        glm::vec4 color = glm::vec4(0.75, 0.75, 0.75, 1.0); // White color
+        glm::vec4 color = glm::vec4(0.55, 0.55, 0.55, 1.0); // White color
         data.colors.push_back(color);
         data.colors.push_back(color);
         data.colors.push_back(color);
@@ -48,7 +48,7 @@ namespace DrawSupport {
             // Already a triangle, directly use the vertices
             for (int i = 0; i < 3; i++) {
                 data.vertices.push_back(vertices[i]->position);
-                data.colors.push_back(glm::vec4(0.75, 0.75, 0.75, 1.0)); // Assuming white color for simplicity
+                data.colors.push_back(glm::vec4(0.55, 0.55, 0.55, 1.0)); // Assuming white color for simplicity
                 data.normals.push_back(normal);
             }
         } else if (vertices.size() == 4) {

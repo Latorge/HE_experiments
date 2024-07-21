@@ -92,10 +92,21 @@ SET(DrawSupport_SRC
 
 )
 
+SET(Intersection_INC
+    src/lib/Intersection/intersections.hpp
+    src/lib/Intersection/TriangleMeshAABB.hpp
+)
+SET(Intersection_SRC
+    src/lib/Intersection/TriangleMeshAABB.cpp
+
+)
+
+
 SET(Operations_INC
     src/lib/Operations/Operations.hpp
     src/lib/CreateOperations/createOperations.hpp
     src/lib/Modificators/Modificators.hpp
+   
 
 )
 SET(Operations_SRC
@@ -149,6 +160,7 @@ SET(main_SRC
 add_library(${MODULE_NAME} STATIC
         ${Operations_INC} ${Operations_SRC}
         ${DrawSupport_INC} ${DrawSupport_SRC}
+        ${Intersection_INC} ${Intersection_SRC}
         ${main_INC} ${main_SRC}
         ${main_SRC_ext}
 )

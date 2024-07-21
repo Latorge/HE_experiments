@@ -5,6 +5,7 @@
 #include "lib/Operations/Operations.hpp"
 #include "lib/CreateOperations/createOperations.hpp"
 #include "lib/Modificators/Modificators.hpp"
+#include "lib/Intersection/intersections.hpp"
 #include "lib/DrawSupport/drawSupport.hpp"
 #include "lib/Core/HalfedgeDS.hpp"
 
@@ -19,6 +20,7 @@ namespace HalfedgeLib {
             HalfedgeDS halfedgeDS01;
 
             void testCube(HalfedgeDS& halfedgeDS);
+            void intersectionAABB(HalfedgeDS &halfedgeDS);
             std::vector<DrawSupport::PointInfo> getLinesfromHEDS(HalfedgeDS &halfedgeDS, bool onlyBoundaryLines, bool drawArrows);
 
             DrawSupport::GeometryData getTrianglesfromHEDS(HalfedgeDS &halfedgeDS);
