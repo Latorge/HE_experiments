@@ -10,8 +10,8 @@ namespace HalfedgeLib {
         //auto protoCube=Operations::generateQuadArrays(1,1,1.0);
         //auto protoCube=Operations::generateQuadArrays(3,3,1.0);
 
-        //auto protoCube=Operations::generateQuadArrays(11,11,1.0);
-        auto protoCube=Operations::generateQuadArraysCube(5,5,5,1.0);
+        auto protoCube=Operations::generateQuadArrays(11,11,1.0);
+       // auto protoCube=Operations::generateQuadArraysCube(5,5,5,1.0);
 /*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
@@ -50,7 +50,8 @@ namespace HalfedgeLib {
         auto faceExp3=halfedgeDS01.getFaces()[33];
         Operations::removeFace(halfedgeDS01,faceExp3);
 */  
-     //  processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
+       processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
+       halfedgeDS01.removeFreeVertices();
        //  processRandomDeleteHalfedges(halfedgeDS01, 1, 0.075f);
 /*
         auto faceTemp= halfedgeDS01.getFace(0);
@@ -66,7 +67,7 @@ namespace HalfedgeLib {
         auto vertexTemp= halfedgeDS01.getVertex(8);
         std::vector<Halfedge*> neighbors = vertexTemp->allHalfedgesInLoop();
         std::cout<<"--------------------"<<std::endl;
-        std::vector<Halfedge*> neighbors3 = vertexTemp->allHalfedgesInLoopExp();
+        std::vector<Halfedge*> neighbors3 = vertexTemp->allHalfedgesInLoopCCW();
         std::cout<<"--------------------"<<std::endl;
         std::vector<Halfedge*> neighbors2 = vertexTemp->allOutgoingHalfedges();
         std::cout<<"--------------------"<<std::endl;
@@ -75,6 +76,27 @@ namespace HalfedgeLib {
         std::cout<<"number neibors: "<<neighbors3.size()<<std::endl;
         std::cout<<"number neibors outgoing: "<<neighbors2.size()<<std::endl;
 
+        {   
+            HalfedgeDS halfedgeDS02=halfedgeDS01;
+            //auto faceTemp= halfedgeDS01.getFace(0);
+            auto vertexTemp= halfedgeDS02.getVertex(8);
+            std::vector<Halfedge*> neighbors = vertexTemp->allHalfedgesInLoop();
+            std::cout<<"--------------------"<<std::endl;
+            std::vector<Halfedge*> neighbors3 = vertexTemp->allHalfedgesInLoopCCW();
+            std::cout<<"--------------------"<<std::endl;
+            std::vector<Halfedge*> neighbors2 = vertexTemp->allOutgoingHalfedges();
+            std::cout<<"--------------------"<<std::endl;
+
+            std::cout<<"number neibors: "<<neighbors.size()<<std::endl;
+            std::cout<<"number neibors: "<<neighbors3.size()<<std::endl;
+            std::cout<<"number neibors outgoing: "<<neighbors2.size()<<std::endl;
+
+
+            std::cout<<"HEDS2 number faces: "<<halfedgeDS02.getFaces().size()<<std::endl;
+            std::cout<<"HEDS2 number vertex: "<<halfedgeDS02.getVertices().size()<<std::endl;
+            std::cout<<"HEDS2 number halfEdges: "<<halfedgeDS02.getHalfedges().size()<<std::endl;
+        }
+        
        // auto commonFaces=vertexTemp->commonFacesWithVertex();
       //  std::cout<<"numbercommon faces: "<<commonFaces.size()<<std::endl;
 

@@ -7,7 +7,6 @@
 #include "Struct.hpp"
 #include "Geometry.hpp"
 
-
 class Halfedge {
 public:
     bool      visited = false;
@@ -22,19 +21,14 @@ public:
     Halfedge(Vertex* vertex, int _id=-1);
 
     std::string getId() const ;
-
     std::string getIdReverse() const ;
 
     bool containsPoint(const glm::vec3& point, float tolerance) ;
-
     bool isFree() const ;
-
     bool isBoundary() const ;
-
     bool isConcave() const ;
 
     void forEachHalfedgeCW(const std::function<void(Halfedge*)>& action);
-
     void forEachHalfedgeCCW(const std::function<void(Halfedge*)>& action);
 
     std::vector<Halfedge *> nextLoop();

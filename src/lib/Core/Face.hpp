@@ -39,7 +39,7 @@ public:
     bool isFront(const glm::vec3& position) ;
 
     Halfedge* halfedgeFromPosition(const glm::vec3& position, float tolerance );
-    Halfedge *halfedgeFromVertex(Vertex *vertex);
+    Halfedge* halfedgeFromVertex(Vertex *vertex);
 
     Vertex* vertexFromPosition(const glm::vec3& position, float tolerance) ;
     bool hasVertex(Vertex* vertex);

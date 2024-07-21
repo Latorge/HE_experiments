@@ -345,8 +345,8 @@ void processFaces(HalfedgeDS& structDS, int vertexCount) {
             Halfedge* startHalfEdge = vertex->halfedge;
             if (!startHalfEdge)
                 continue;
-                
-            std::vector<Halfedge*> neighbors = vertex-> allHalfedgesInLoopExp();
+
+            std::vector<Halfedge*> neighbors = vertex-> allHalfedgesInLoop();
             size_t nlen = neighbors.size();
 
             std::vector<Halfedge*> borderEdges;

@@ -35,7 +35,7 @@ public:
     void move(const glm::vec3& vector) ;
 
     std::vector<Halfedge *> allHalfedgesInLoop(Halfedge *start = nullptr);
-    std::vector<Halfedge *> allHalfedgesInLoopExp(Halfedge *start= nullptr);
+    std::vector<Halfedge *> allHalfedgesInLoopCCW(Halfedge *start= nullptr);
     std::vector<Halfedge *> allOutgoingHalfedges(Halfedge *start = nullptr);
     std::vector<Halfedge *> freeHalfedgesInLoop(Halfedge *start = nullptr);
 

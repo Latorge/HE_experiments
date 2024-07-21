@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <set>
+#include <map>
 #include "Vertex.hpp"
 #include "Halfedge.hpp"
 #include "Face.hpp"
@@ -22,28 +23,27 @@ private:
     int vertexIDCounter = 0;
     int halfedgeIDCounter = 0;
     int faceIDCounter = 0;
-/*
-    int addHalfedge(const Halfedge& halfedge) {
-        Halfedge* newHalfedge = new Halfedge(halfedge, halfedgeIDCounter); 
-        halfedges.push_back(newHalfedge);
-        return halfedgeIDCounter++;  // Return the ID then increment the counter
-    }
 
-    int addFace(const Face& face) {
-        Face* newFace = new Face(face, faceIDCounter); 
-        faces.push_back(newFace);
-        return faceIDCounter++;  // Return the ID then increment the counter
-    }
-*/
 public:
 
     HalfedgeDS(std::string _name, int _id): name(_name), id(_id) {}
+
+    HalfedgeDS(const HalfedgeDS& other) {
+        copyFrom(other);
+    }
+
+    HalfedgeDS& operator=(const HalfedgeDS& other) {
+        if (this != &other) {
+            clear();
+            copyFrom(other);
+        }
+        return *this;
+    }
 
     // Methods to add components to the data structure
     Vertex* addVertexDirect(glm::vec3 position);
     Vertex *addVertexFromPosition(glm::vec3 position, bool checkDuplicates, float tolerance= 1e-10);
     
-
     bool addVertex(Vertex *vertex);    
     bool removeHalfedge(Halfedge *halfedge);
     bool containsHalfedge(Halfedge *halfedge);
@@ -72,6 +72,11 @@ public:
 
     // Destructor to properly clean up memory
     ~HalfedgeDS();
+
+    void removeFreeVertices();
+
+private:
+    void copyFrom(const HalfedgeDS& other);
    
 };
 

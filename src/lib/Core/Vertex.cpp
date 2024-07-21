@@ -29,18 +29,17 @@ std::vector<Halfedge*> Vertex::allHalfedgesInLoop(Halfedge* start) {
      std::vector<Halfedge*> allHalfedges;
         for (auto it =  beginCW(start); it != endCW(); ++it) {
                 allHalfedges.push_back(*it);
-                std::cout << "Halfedge at: " << (*it)->getId() <<std::endl;
+                //std::cout << "Halfedge at: " << (*it)->getId() <<std::endl;
 
         }
     return allHalfedges;
 }
 
-std::vector<Halfedge*> Vertex::allHalfedgesInLoopExp(Halfedge* start) {
+std::vector<Halfedge*> Vertex::allHalfedgesInLoopCCW(Halfedge* start) {
      std::vector<Halfedge*> allHalfedges;
         for (auto it =  beginCW(start); it != endCW(); --it) {
                 allHalfedges.push_back(*it);
-                std::cout << "Halfedge at: " << (*it)->getId() <<std::endl;
-
+                //std::cout << "Halfedge at: " << (*it)->getId() <<std::endl;
         }
     return allHalfedges;
 }

@@ -154,3 +154,78 @@ int HalfedgeDS::getNextFaceID() const {
 HalfedgeDS::~HalfedgeDS() {
     clear();
 }
+
+void HalfedgeDS::removeFreeVertices() {
+        std::set<Vertex*> verticesWithHalfedge;
+
+        // Collect all vertices linked to halfedges
+        for (auto& he : halfedges) {
+            verticesWithHalfedge.insert(he->vertex);
+        }
+
+        // Collect vertices that are not linked to any halfedge
+        std::vector<Vertex*> verticesToDelete;
+        for (auto& v : vertices) {
+            if (verticesWithHalfedge.find(v) == verticesWithHalfedge.end()) {
+                verticesToDelete.push_back(v);
+            }
+        }
+
+        // Remove the collected vertices
+        auto newEnd = std::remove_if(vertices.begin(), vertices.end(),
+            [&verticesToDelete](Vertex* v) {
+                return std::find(verticesToDelete.begin(), verticesToDelete.end(), v) != verticesToDelete.end();
+            });
+        vertices.erase(newEnd, vertices.end());
+
+        // Assuming memory management responsibility, delete the vertices
+        for (auto& v : verticesToDelete) {
+            delete v;
+        }
+    }
+
+void HalfedgeDS::copyFrom(const HalfedgeDS &other)
+{
+    std::map<Vertex*, Vertex*> vertexMap;
+    std::map<Halfedge*, Halfedge*> halfedgeMap;
+    std::map<Face*, Face*> faceMap;
+
+    // Copy vertices
+    for (auto v : other.getVertices()) {
+        Vertex* newVertex = new Vertex(*v);  // Assuming Vertex has a copy constructor
+        vertices.push_back(newVertex);
+        vertexMap[v] = newVertex;
+    }
+
+    // Copy halfedges
+    for (auto he : other.getHalfedges()) {
+        Halfedge* newHalfedge = new Halfedge(*he);  // Assuming Halfedge has a copy constructor
+        halfedges.push_back(newHalfedge);
+        halfedgeMap[he] = newHalfedge;
+    }
+
+    // Copy faces
+    for (auto f : other.getFaces()) {
+        Face* newFace = new Face(*f);  // Assuming Face has a copy constructor
+        faces.push_back(newFace);
+        faceMap[f] = newFace;
+    }
+
+    // Re-link all halfedge pointers
+    for (auto he : halfedges) {
+        he->vertex = vertexMap[he->vertex];
+        he->next = halfedgeMap[he->next];
+        he->prev = halfedgeMap[he->prev];
+        he->twin = halfedgeMap[he->twin];
+        he->face = faceMap[he->face];
+    }
+
+    // Update vertex halfedges and face halfedges
+    for (auto v : vertices) {
+        v->halfedge = halfedgeMap[v->halfedge];
+    }
+
+    for (auto f : faces) {
+        f->halfedge = halfedgeMap[f->halfedge];
+    }
+}
