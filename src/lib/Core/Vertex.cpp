@@ -27,9 +27,9 @@ void Vertex::move(const glm::vec3& vector) {
 
 std::vector<Halfedge*> Vertex::allHalfedgesInLoop(Halfedge* start) {
      std::vector<Halfedge*> allHalfedges;
-        for (auto it =  beginCW(start); it != endCW(); --it) {
+        for (auto it =  beginCW(start); it != endCW(); ++it) {
                 allHalfedges.push_back(*it);
-                 std::cout << "Halfedge at: " << (*it)->getId() <<std::endl;
+                std::cout << "Halfedge at: " << (*it)->getId() <<std::endl;
 
         }
     return allHalfedges;
@@ -39,7 +39,7 @@ std::vector<Halfedge*> Vertex::allHalfedgesInLoopExp(Halfedge* start) {
      std::vector<Halfedge*> allHalfedges;
         for (auto it =  beginCW(start); it != endCW(); --it) {
                 allHalfedges.push_back(*it);
-                 std::cout << "Halfedge at: " << (*it)->getId() <<std::endl;
+                std::cout << "Halfedge at: " << (*it)->getId() <<std::endl;
 
         }
     return allHalfedges;
@@ -62,24 +62,7 @@ std::vector<Halfedge*> Vertex::allOutgoingHalfedges(Halfedge* start) {
     }
     return outgoingHalfedges;
 }
-/*
-std::vector<Halfedge*> Vertex::allHalfedgesInLoop(Halfedge* start) {
-    std::unordered_set<Halfedge*, HalfedgeHash> uniqueHalfedges;  // Set to store unique halfedges
-    std::vector<Halfedge*> allHalfedges;  // Vector to return
 
-    for (auto it = beginCW(start); it != endCW(); ++it) {
-        Halfedge* he = &(*it);
-        if (he->vertex == this) {  // Ensure that only halfedges whose vertex is this vertex are considered
-            uniqueHalfedges.insert(he);  // Insert halfedge into set to ensure uniqueness
-        }
-    }
-
-    // Transfer unique halfedges from set to vector
-    allHalfedges.assign(uniqueHalfedges.begin(), uniqueHalfedges.end());
-
-    return allHalfedges;
-}
-*/
 std::vector<Halfedge*> Vertex::freeHalfedgesInLoop(Halfedge* start) {
         std::vector<Halfedge*> freeHalfedges;
         for (auto it =  beginCW(start); it != endCW(); ++it) {
@@ -98,13 +81,11 @@ Halfedge* Vertex::freeHalfedgesInLoopNext(Halfedge* start) {
         
     if (!start) start = this->halfedge; // Use the vertex's halfedge if no start is provided
     int count = 0;  // Counter to find the second free halfedge
-    // Iterate over the halfedges in a clockwise direction
     for (auto it =  beginCW(start); it != endCW(); ++it) {
         // Check if the twin of the current halfedge exists and is free
-       // if ((*it)->twin && (*it)->twin->isFree()) {
         if ((*it)->twin && (*it)->twin->isFree()) {
             count++;
-            if (count == 2) {
+            if (count == 1) {
                 return (*it)->twin; // Return the second free halfedge if found
             }
         }
@@ -116,7 +97,6 @@ Halfedge* Vertex::freeHalfedgesInLoopNext(Halfedge* start) {
 
 Halfedge* Vertex::findBoundaryHalfedge(Halfedge* halfIn, Halfedge* halfOut) {
     Halfedge* g = nullptr;
-
     // Start iteration from the halfedge outwards, assuming halfOut->vertex points to the starting vertex
     auto it = halfOut->vertex->beginCW(halfOut);
     while (it.hasNext()) {
@@ -129,7 +109,6 @@ Halfedge* Vertex::findBoundaryHalfedge(Halfedge* halfIn, Halfedge* halfOut) {
         // Make sure to not infinitely loop; stop if we come back to the starting point
         if (he == halfOut) break;
     }
-
     return g;
 }
 
@@ -152,8 +131,6 @@ bool Vertex::isIsolated() {
 
 std::vector<Face*> Vertex::commonFacesWithVertex(Vertex* other) {
     std::vector<Face*> commonFaces;
-
-    // Use the CWIterator to iterate over the halfedges in a clockwise direction
     for (auto it = beginCW(); it != endCW(); ++it) {
          // Since the iterator returns a Halfedge reference, get the pointer with the address-of operator
         Halfedge* he = *it;
@@ -180,7 +157,6 @@ bool Vertex::matchesPosition(const glm::vec3& pos, float tolerance = 1e-10) {
 Halfedge* Vertex::getHalfedgeToVertex(Vertex* other) {
     if(!this->halfedge)
         return nullptr;
-    // Use the CWIterator to iterate over the halfedges in a clockwise direction
     for (auto it = beginCW(); it != endCW(); ++it) {
         // Check if the twin of the current halfedge points to the other vertex
         if ((*it)->twin && (*it)->twin->vertex == other) {
@@ -193,28 +169,15 @@ Halfedge* Vertex::getHalfedgeToVertex(Vertex* other) {
 bool Vertex::isConnectedToVertex(Vertex* other) {
     return getHalfedgeToVertex(other) != nullptr;
 }
-/*
-std::vector<Halfedge*> Vertex::loopCW() {
-    std::vector<Halfedge*> edges;
-    if (!halfedge) return edges;
 
-    Halfedge* start = halfedge;
-    Halfedge* curr = start;
-    do {
-        edges.push_back(curr);
-        curr = curr->twin->next;
-    } while (curr != start);
 
-    return edges;
-}
-*/
 // Function to calculate the normal of the vertex
 glm::vec3 Vertex::calculateVertexNormal() {
     glm::vec3 normal(0.0f, 0.0f, 0.0f);
     std::set<Face*> sharedFaces;
 
     // Collect faces that share this vertex
-    for (auto it = beginCW(); it != endCW(); --it) {
+    for (auto it = beginCW(); it != endCW(); ++it) {
         if ((*it)->face) {
             sharedFaces.insert((*it)->face);
         }
@@ -248,70 +211,17 @@ float Vertex::calculateAngleWeight(Face* face, const glm::vec3& faceNormal, size
     return std::acos(glm::dot(faceNormal, vertexToFaceCenter) / (glm::length(faceNormal) * glm::length(vertexToFaceCenter))) / numCommonVertices;
 }
 
- // Prefix increment
-/*
-Vertex::CWIterator& Vertex::CWIterator::operator++() {
-     if (current && current->twin) {
-        current = current->twin->next;
-        if (current == start) {
-            if (!firstPass) {
-                current = nullptr;  // End the iteration
-            }
-            firstPass = false;
-        }
-    }
-    return *this;
-}
-*/
-/*
-Vertex::CWIterator& Vertex::CWIterator::operator++() {
-     if (current && current->twin) {
-        current = current->twin->next;
-        if (current == start) {
-            if (!firstPass) {
-                current = nullptr;  // End the iteration
-            }
-            firstPass = false;
-        }
-    }
-    return *this;
-}
-*/
-/*
-Vertex::CWIterator& Vertex::CWIterator::operator++() {
-    if (current && current->twin) {
-        Halfedge* next = current->twin->next;
-        // Move to the next halfedge
-        current = next;
-
-        // If returning to the start, check the firstPass flag
-        if (current == start && !firstPass) {
-            current = nullptr;  // End the iteration here
-        }// else if (current == start)
-        firstPass = false;
-
-    } else {
-        // End iteration if no twin or can't proceed to next halfedge
-        current = nullptr;
-        firstPass = false;
-    }
-    return *this;
-}
-*/
 
 Halfedge* Vertex::CWIterator::getHE() {return current;}
 
 
 Vertex::CWIterator Vertex::beginCW(Halfedge* start){
         start=start ? start : this->halfedge;
-        
          if (!start) {  // Check if start is still nullptr
-            std::cerr << "Error: start halfedge is nullptr." << std::endl;
-            //throw std::runtime_error("Start halfedge is nullptr.");
+            throw std::runtime_error("Start halfedge is nullptr.");
             return CWIterator(nullptr, false);
         }
-        
-        std::cout << "Starting iteration. start is :"<<start->getId() << std::endl; 
+        //std::cout << "Starting iteration. start is :"<<start->getId() << std::endl; 
         return CWIterator(start, true);
 }
 
@@ -320,14 +230,13 @@ Vertex::CWIterator Vertex::endCW()
     return Vertex::CWIterator(nullptr, false);
 }
 
+// Prefix increment
 Vertex::CWIterator& Vertex::CWIterator::operator++() {
-     if (current && current->twin) {
-        current = current->twin->next;
+    if (current && current->twin) {
+        current=current->twin->next;
         if (current == start) {
-            if (!firstPass) {
-                current = nullptr;  // End the iteration
-            }
-            firstPass = false;
+            current=nullptr;
+            return *this;
         }
     }
     return *this;
@@ -335,24 +244,15 @@ Vertex::CWIterator& Vertex::CWIterator::operator++() {
 
 
 Vertex::CWIterator& Vertex::CWIterator::operator--() {
-     if (current && current->twin) {
-        current=current->twin->next;
+    if (current && current->prev && current->prev->twin) {
+        current = current->prev->twin;
         if (current == start) {
-            //if (firstPass==false)
-            {
-                std::cout << "Traversing from Halfedge at: " << current->getId() <<" flag "<< firstPass<<std::endl;
-                secondPass=false;
-                current=nullptr;
-                return *this;
-            }
-
-            firstPass = false;
+            //std::cout << "Traversing from Halfedge at: " << current->getId() <<" flag "<< firstPass<<std::endl;
+            current=nullptr;
+            return *this;
         }
-        
-       // firstPass = false;
-
     }
-    std::cout << "Traversing from Halfedge at: " << current->getId() <<" flag "<< firstPass<<std::endl;
+    //std::cout << "Traversing from Halfedge at: " << current->getId() <<" flag "<< firstPass<<std::endl;
     return *this;
 }
 
@@ -388,23 +288,19 @@ void Vertex::CWIterator::reset() {
 }
 
 
- // Prefix decrement
-Vertex::CCWIterator& Vertex::CCWIterator::operator--() {
-    if (current && current->prev && current->prev->twin) {
-        current = current->prev->twin;
-        if (current == start) {
-            if (!firstPass) {
-                current = nullptr; // End the iteration
-            }
-            firstPass = false;
-        }
-    }
-    return *this;
-}
+// some code that can be useful
+/*
+std::vector<Halfedge*> Vertex::loopCW() {
+    std::vector<Halfedge*> edges;
+    if (!halfedge) return edges;
 
-// Postfix decrement
-Vertex::CCWIterator Vertex::CCWIterator::operator--(int) {
-    CCWIterator tmp = *this;
-    --(*this);
-    return tmp;
+    Halfedge* start = halfedge;
+    Halfedge* curr = start;
+    do {
+        edges.push_back(curr);
+        curr = curr->twin->next;
+    } while (curr != start);
+
+    return edges;
 }
+*/

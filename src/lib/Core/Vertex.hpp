@@ -61,7 +61,6 @@ public:
         Halfedge* current;
         Halfedge* start;
         bool firstPass;
-        bool secondPass;
     public:
 
         using iterator_category = std::forward_iterator_tag;
@@ -70,8 +69,7 @@ public:
         using pointer = Halfedge*;
         using reference = Halfedge&;
 
-        CWIterator(Halfedge* start, bool isFirst = true) : start(start), current(start),
-         firstPass(isFirst), secondPass(isFirst) {}
+        CWIterator(Halfedge* start, bool isFirst = true) : start(start), current(start), firstPass(isFirst){}
 
         //reference operator*() const { return current; }
         pointer operator*() const { return current; }
@@ -103,41 +101,6 @@ public:
 
     CWIterator beginCW(Halfedge* start = nullptr);
     CWIterator endCW();
-
-    class CCWIterator {
-    private:
-        Halfedge* start;
-        Halfedge* current;
-        bool firstPass;
-
-    public:
-        using iterator_category = std::forward_iterator_tag;
-        using value_type = Halfedge;
-        using difference_type = std::ptrdiff_t;
-        using pointer = Halfedge*;
-        using reference = Halfedge&;
-
-        CCWIterator(Halfedge* start, bool isFirst = true) : start(start), current(start), firstPass(isFirst) {}
-
-        reference operator*() const { return *current; }
-        pointer operator->() { return current; }
-
- 
-
-        // Prefix decrement
-        CCWIterator& operator--();
-
-        // Postfix decrement
-        CCWIterator operator--(int);
-
-        friend bool operator==(const CCWIterator& a, const CCWIterator& b) {
-            return a.current == b.current;
-        }
-        friend bool operator!=(const CCWIterator& a, const CCWIterator& b) {
-            return a.current != b.current;
-        }
-        
-    };
  
 private:
    

@@ -63,10 +63,13 @@ namespace HalfedgeLib {
         Operations::cutFace(halfedgeDS01,faceTemp,newVertex,newVertex2, true);
 */
         //auto faceTemp= halfedgeDS01.getFace(0);
-        auto vertexTemp= halfedgeDS01.getVertex(0);
+        auto vertexTemp= halfedgeDS01.getVertex(8);
         std::vector<Halfedge*> neighbors = vertexTemp->allHalfedgesInLoop();
+        std::cout<<"--------------------"<<std::endl;
         std::vector<Halfedge*> neighbors3 = vertexTemp->allHalfedgesInLoopExp();
+        std::cout<<"--------------------"<<std::endl;
         std::vector<Halfedge*> neighbors2 = vertexTemp->allOutgoingHalfedges();
+        std::cout<<"--------------------"<<std::endl;
 
         std::cout<<"number neibors: "<<neighbors.size()<<std::endl;
         std::cout<<"number neibors: "<<neighbors3.size()<<std::endl;
