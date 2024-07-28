@@ -168,5 +168,22 @@ bool Face::isNormalCalculated() const {
     return normalFlag;
 }
 
+ void Face::setHalfedges(const std::vector<Halfedge*>& halfEdgeList) {
+        if (halfEdgeList.empty()) return;
+
+        halfedge = halfEdgeList.front(); // set the first halfedge in the list as the primary halfedge
+
+        // Link the halfedges cyclically
+        for (size_t i = 0; i < halfEdgeList.size(); i++) {
+            Halfedge* current = halfEdgeList[i];
+            Halfedge* next = halfEdgeList[(i + 1) % halfEdgeList.size()]; // cycle back to the first at the end
+            current->next = next;
+            next->prev = current;
+
+            // Additionally, ensure each halfedge points back to this face
+            current->face = this;
+        }
+}
+
 
 

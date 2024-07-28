@@ -82,9 +82,11 @@ public:
 
     void removeFreeVertices();
 
-private:
     void copyFrom(const HalfedgeDS& other);
-   
+    void mergeFrom(HalfedgeDS &other);
+
+private:
+    
 };
 
 #endif // HALFEDGE_DS_H

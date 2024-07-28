@@ -17,6 +17,8 @@ namespace intersections {
     }
 
     int TriangleMeshAABB::countIntersections(const Kernel::Ray_3& ray) {
+
+        
         return tree.number_of_intersected_primitives(ray);
     }
 

@@ -250,3 +250,74 @@ void HalfedgeDS::copyFrom(const HalfedgeDS &other)
         f->halfedge = halfedgeMap[f->halfedge];
     }
 }
+
+void HalfedgeDS::mergeFrom( HalfedgeDS& other) {
+    /*
+    // Directly append vertices
+    this->vertices.insert(this->vertices.end(), other.vertices.begin(), other.vertices.end());
+
+    // Directly append halfedges
+    this->halfedges.insert(this->halfedges.end(), other.halfedges.begin(), other.halfedges.end());
+
+    // Directly append faces
+    this->faces.insert(this->faces.end(), other.faces.begin(), other.faces.end());
+    */
+
+   std::map<Vertex*, Vertex*> vertexMap;
+    std::map<Halfedge*, Halfedge*> halfedgeMap;
+    std::map<Face*, Face*> faceMap;
+
+    // Add vertices from 'other' to 'this'
+    for (auto v : other.getVertices()) {
+        Vertex* newVertex = new Vertex(*v);  // Copy constructor
+        this->vertices.push_back(newVertex);
+        vertexMap[v] = newVertex;
+    }
+
+    // Add halfedges from 'other' to 'this'
+    for (auto he : other.getHalfedges()) {
+        Halfedge* newHalfedge = new Halfedge(*he);  // Copy constructor
+        this->halfedges.push_back(newHalfedge);
+        halfedgeMap[he] = newHalfedge;
+    }
+
+    // Add faces from 'other' to 'this'
+    for (auto f : other.getFaces()) {
+        Face* newFace = new Face(*f);  // Copy constructor
+        this->faces.push_back(newFace);
+        faceMap[f] = newFace;
+    }
+
+    // Re-link all halfedge pointers in the newly added elements
+    for (auto he : this->halfedges) {
+        if (halfedgeMap.count(he->vertex->halfedge)) {  // Ensure the halfedge pointer of the vertex is within the added elements
+            he->vertex = vertexMap[he->vertex];
+        }
+        if (halfedgeMap.count(he->next)) {
+            he->next = halfedgeMap[he->next];
+        }
+        if (halfedgeMap.count(he->prev)) {
+            he->prev = halfedgeMap[he->prev];
+        }
+        if (halfedgeMap.count(he->twin)) {
+            he->twin = halfedgeMap[he->twin];
+        }
+        if (faceMap.count(he->face)) {
+            he->face = faceMap[he->face];
+        }
+    }
+
+    // Update vertex and face halfedges if they are pointing to halfedges from the added elements
+    for (auto v : this->vertices) {
+        if (halfedgeMap.count(v->halfedge)) {
+            v->halfedge = halfedgeMap[v->halfedge];
+        }
+    }
+
+    for (auto f : this->faces) {
+        if (halfedgeMap.count(f->halfedge)) {
+            f->halfedge = halfedgeMap[f->halfedge];
+        }
+    }
+}
+

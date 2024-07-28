@@ -11,7 +11,13 @@ namespace HalfedgeLib {
         //auto protoCube=Operations::generateQuadArrays(3,3,1.0);
 
        // auto protoCube=Operations::generateQuadArrays(11,11,1.0);
-        auto protoCube=Operations::generateQuadArraysCube(5,5,5,1.0);
+       // auto protoCube=Operations::generateQuadArraysCube(5,5,5,1.0);
+
+        std::vector<glm::vec3> sourcePoints;
+        int N = 30; // Number of points
+        float radius = 35.0f; // Radius of the half-circle
+        fillHalfCirclePoints(sourcePoints, N, radius);
+        auto protoCube=Operations::generateTube(sourcePoints,7,0,0);
 /*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
@@ -35,12 +41,31 @@ namespace HalfedgeLib {
 
         std::cout << "---------------------" << std::endl;
 */
-        Operations::setFromGeometry(halfedgeDS01,protoCubeUniqVertex.positions, protoCubeUniqVertex.cells);
+        //Operations::setFromGeometry(halfedgeDS01,protoCubeUniqVertex.positions, protoCubeUniqVertex.cells);
         //Operations::setFromGeometry(halfedgeDS01,protoCube.positions, protoCube.cells);
+
+    
 
         std::cout<<"HEDS number faces: "<<halfedgeDS01.getFaces().size()<<std::endl;
         std::cout<<"HEDS number vertex: "<<halfedgeDS01.getVertices().size()<<std::endl;
         std::cout<<"HEDS number halfEdges: "<<halfedgeDS01.getHalfedges().size()<<std::endl;
+
+        {
+            HalfedgeDS temphalfedgeDS("temp",2);
+            std::vector<glm::vec3> sourcePoints;
+            int N = 20; // Number of points
+            float radius = 12.0f; // Radius of the half-circle
+            fillSpiralPointsNAU(sourcePoints, N, 1.5,12.5, 5, 2.75);
+            auto protoCube=Operations::generateTubeNL(sourcePoints,0.25,9,0,0);
+
+            //auto protoCube=Operations::generateQuadArraysCube(3,3,3,1.0);
+            auto protoCubeUniqVertex=Operations::computeUniquePositionsArray(protoCube.positions,protoCube.cells);
+
+            //Operations::setFromGeometry(halfedgeDS01,protoCubeUniqVertex.positions, protoCubeUniqVertex.cells);
+            Operations::setFromGeometry(temphalfedgeDS,protoCube.positions, protoCube.cells);
+
+            halfedgeDS01.mergeFrom(temphalfedgeDS);
+        }
 
 /*
         auto faceExp=halfedgeDS01.getFaces()[33];
@@ -155,6 +180,90 @@ namespace HalfedgeLib {
         
     }
 
+    void FrontClass::fillHalfCirclePoints(std::vector<glm::vec3>& sourcePoints, int N, float radius) {
+        if (N < 2) {
+            std::cerr << "Error: N must be at least 2 to form a half-circle." << std::endl;
+            return;
+        }
+
+        float angleIncrement = 2.0f*glm::pi<float>() / (N - 1); // Divide the half-circle into (N-1) segments
+
+        for (int i = 0; i < N; ++i) {
+            float theta = i * angleIncrement; // Current angle
+            float x = radius * cos(theta);    // Calculate x coordinate
+            float z = radius * sin(theta);    // Calculate z coordinate
+            sourcePoints.push_back(glm::vec3(x, 0, z)); // y is zero since it's on the xz-plane
+        }
+    }
+
+    void FrontClass::fillSpiralPoints(std::vector<glm::vec3>& sourcePoints, int N, float initialRadius, float finalRadius, int numberOfLoops) {
+        if (N < 2) {
+            std::cerr << "Error: N must be at least 2 to form a meaningful spiral." << std::endl;
+            return;
+        }
+        if (numberOfLoops < 1) {
+            std::cerr << "Error: numberOfLoops must be at least 1." << std::endl;
+            return;
+        }
+
+        // Total number of points is N points per loop times the number of loops
+        float totalHeight = 1.0f; // Total height of the spiral from start to end
+        float heightIncrement = totalHeight / (numberOfLoops * (N - 1)); // Height increment per point
+
+        // Calculate the total angle and the radius increment
+        float totalAngle = 2.0f * glm::pi<float>() * numberOfLoops; // Total angle covered by the spiral
+        float radiusIncrement = (finalRadius - initialRadius) / (numberOfLoops * (N - 1)); // Change in radius per point
+
+        for (int loop = 0; loop < numberOfLoops; ++loop) {
+            for (int i = 0; i < N; ++i) {
+                float fraction = (loop * N + i) / float(numberOfLoops * (N - 1)); // Fraction of the way through the loops
+                float theta = fraction * totalAngle; // Current angle
+                float radius = initialRadius + fraction * (finalRadius - initialRadius); // Current radius
+                float x = radius * cos(theta);    // Calculate x coordinate
+                float z = radius * sin(theta);    // Calculate z coordinate
+                float y = fraction * totalHeight; // Current height based on the fraction of the total loops
+
+                sourcePoints.push_back(glm::vec3(x, y, z));
+            }
+        }
+    }
+
+    void FrontClass::fillSpiralPointsNAU(std::vector<glm::vec3>& sourcePoints, int N, float initialRadius, float finalRadius, int numberOfLoops, float radiusCoeff) {
+        if (N < 2) {
+            std::cerr << "Error: N must be at least 2 to form a meaningful spiral." << std::endl;
+            return;
+        }
+        if (numberOfLoops < 1) {
+            std::cerr << "Error: numberOfLoops must be at least 1." << std::endl;
+            return;
+        }
+
+        // Total number of points is N points per loop times the number of loops
+        float totalHeight = 1.0f; // Total height of the spiral from start to end
+        float heightIncrement = totalHeight / (numberOfLoops * (N - 1)); // Height increment per point
+
+        // Calculate the total angle covered by the spiral
+        float totalAngle = 2.0f * glm::pi<float>() * numberOfLoops;
+
+        for (int loop = 0; loop < numberOfLoops; ++loop) {
+            for (int i = 0; i < N; ++i) {
+                float fraction = (loop * N + i) / float(numberOfLoops * N - 1); // Fraction of the way through the loops
+                float theta = fraction * totalAngle; // Current angle
+
+                // Calculate the current radius starting from near zero to the finalRadius using exponential growth
+                float radius = (exp(radiusCoeff * fraction) - 1) * finalRadius / (exp(radiusCoeff) - 1);
+
+                float x = radius * cos(theta);    // Calculate x coordinate
+                float z = radius * sin(theta);    // Calculate z coordinate
+                float y = fraction * totalHeight; // Current height based on the fraction of the total loops
+
+                sourcePoints.push_back(glm::vec3(x, y, z));
+            }
+        }
+    }
+
+
+
 
     std::vector<DrawSupport::PointInfo> FrontClass::getLinesfromHEDS(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines, bool drawArrows){
         std::vector<DrawSupport::PointInfo> resultList;
@@ -166,6 +275,10 @@ namespace HalfedgeLib {
         DrawSupport::GeometryData resultList;
         resultList=DrawSupport::processTriangulateHalfedgeDS(halfedgeDS);
         return resultList;
+    }
+
+    DrawSupport::GeometryData FrontClass::getDebugLines(){
+        return debugLines;
     }
 
     void FrontClass::quadSubDivideHEDS(HalfedgeDS& halfedgeDS){
@@ -190,9 +303,17 @@ namespace HalfedgeLib {
        halfedgeDS01.removeFreeVertices();
     }
 
-     //processRandomDeleteFace(halfedgeDS01, 1, 0.45f);
     void FrontClass::randomExtrudeFaces(HalfedgeDS& halfedgeDS, float rndCoeff, float distExtrude, float amountExtrude){
-       processRandomFaceT(halfedgeDS, 1, rndCoeff, Modificators::extrudeFace, distExtrude, amountExtrude);
+       processRandomFaceT(halfedgeDS, 1, rndCoeff, Modificators::extrudeFace2, distExtrude, amountExtrude);
+       //halfedgeDS01.removeFreeVertices();
+    }
+
+    void FrontClass::clearSelectedFaces(){
+       selectedFaces.clear();
+    }
+
+    void FrontClass::selectedExtrudeFaces(HalfedgeDS& halfedgeDS,  std::vector<Face*> selectedFaces, float distExtrude, float amountExtrude){
+       processSelectedFaceT(halfedgeDS, selectedFaces, Modificators::extrudeFace2, distExtrude, amountExtrude);
        //halfedgeDS01.removeFreeVertices();
     }
 
@@ -271,6 +392,23 @@ namespace HalfedgeLib {
             func(halfedgeDS, face, iterations);
         }
     }
+
+    std::vector<Face*> FrontClass::selectRandomFaces(HalfedgeDS& halfedgeDS, int divideCoeff, float rndCoeff) {
+        auto facesList = halfedgeDS.getFaces();
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(facesList.begin(), facesList.end(), g);
+        std::uniform_real_distribution<> dis(0.0, 1.0);
+        int limit = facesList.size() / divideCoeff;
+        std::vector<Face*> facesToProcess;
+
+        for (int i = 0; i < limit; ++i) {
+            if (dis(g) < rndCoeff) {
+                facesToProcess.push_back(facesList[i]);
+            }
+        }
+        return facesToProcess;
+    }
     //processRandomFace(halfedgeDS01, 10, 0.5, Operations::processFaceRecursiveOppositeEdges, 11);
 
     template<typename Func, typename... Args>
@@ -290,6 +428,13 @@ namespace HalfedgeLib {
         }
 
         for (auto face : facesToProcess) {
+            std::invoke(func, halfedgeDS, face, std::forward<Args>(args)...);
+        }
+    }
+
+    template<typename Func, typename... Args>
+    void FrontClass::processSelectedFaceT(HalfedgeDS& halfedgeDS, std::vector<Face*> selectedFaces, Func func, Args&&... args) {
+        for (auto face : selectedFaces) {
             std::invoke(func, halfedgeDS, face, std::forward<Args>(args)...);
         }
     }

@@ -83,6 +83,12 @@ set(include_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/lib)
 include_directories(${include_DIR})
 
 
+set(splineLib_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../CPP_lib/spline_library)
+set(splineLib_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../../../CPP_lib/spline_library)
+message(STATUS "splineLib_DIR: ${splineLib_DIR}")
+include_directories(${splineLib_DIR})
+
+
 SET(DrawSupport_INC
     src/lib/DrawSupport/drawSupport.hpp
 )
@@ -125,6 +131,7 @@ SET(Operations_SRC
 
     src/lib/CreateOperations/cubeCreater.cpp
     src/lib/CreateOperations/planeCreater.cpp
+    src/lib/CreateOperations/tubeCreater.cpp
 
     src/lib/Modificators/catmullClark.cpp
     src/lib/Modificators/quadSubDivide.cpp
@@ -230,6 +237,7 @@ if (EMSDK_COMPILE)
       #-I ${CGAL_INCLUDE}
       #-I ${BOOST_INCLUDE}
       -I ${glm_DIR}
+      -I ${splineLib_DIR}
       -include ${WEBIDL_HEADER} 
     )
 

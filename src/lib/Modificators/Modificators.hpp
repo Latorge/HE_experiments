@@ -30,6 +30,7 @@ namespace Modificators {
     void quadSubDivide(HalfedgeDS &structDS);
 
     Face *extrudeFace(HalfedgeDS &structDS, Face *face, float distExtrude, float amountExtrude);
+    Face *extrudeFace2(HalfedgeDS &structDS, Face *face, float distExtrude, float amountExtrude);
 }
 
 #endif // MODIFICATORS_HPP
