@@ -31,6 +31,9 @@ namespace Modificators {
 
     Face *extrudeFace(HalfedgeDS &structDS, Face *face, float distExtrude, float amountExtrude);
     Face *extrudeFace2(HalfedgeDS &structDS, Face *face, float distExtrude, float amountExtrude);
+
+
+    void triangleSubDivideStruct(HalfedgeDS &structDS);
 }
 
 #endif // MODIFICATORS_HPP

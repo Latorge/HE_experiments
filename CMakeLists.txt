@@ -98,6 +98,15 @@ SET(DrawSupport_SRC
 
 )
 
+SET(RenderLines_INC
+    src/lib/RenderLines/RenderLines.hpp
+)
+SET(RenderLines_SRC
+    #src/lib/RenderLines/drawHalfEdges.cpp
+    #src/lib/RenderLines/triangulateCentralPoint.cpp
+
+)
+
 SET(Intersection_INC
     src/lib/Intersection/intersections.hpp
     src/lib/Intersection/TriangleMeshAABB.hpp
@@ -136,6 +145,7 @@ SET(Operations_SRC
     src/lib/Modificators/catmullClark.cpp
     src/lib/Modificators/quadSubDivide.cpp
     src/lib/Modificators/extrudeFace.cpp
+    src/lib/Modificators/triangleSunDivide.cpp
 )
 
 SET(main_INC
@@ -167,6 +177,7 @@ SET(main_SRC
 add_library(${MODULE_NAME} STATIC
         ${Operations_INC} ${Operations_SRC}
         ${DrawSupport_INC} ${DrawSupport_SRC}
+        ${RenderLines_INC} ${RenderLines_SRC}
         ${Intersection_INC} ${Intersection_SRC}
         ${main_INC} ${main_SRC}
         ${main_SRC_ext}

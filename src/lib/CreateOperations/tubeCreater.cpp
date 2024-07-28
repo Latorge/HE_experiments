@@ -112,7 +112,8 @@ namespace Operations {
         int number_of_interpolate=3;
         int number_of_segments=numSegments;
 
-        float radiusCoeff=0.00125f;
+       // float radiusCoeff=0.00125f;
+        float radiusCoeff=0.00075f;
         float radiusCoeffSum=0.01f;
 
 
@@ -130,7 +131,7 @@ namespace Operations {
 
 
         //LoopingCubicHermiteSpline<Vector3> sL(splineSourceList);
-       UniformCubicBSpline<Vector3> sL(splineSourceList);
+       NaturalSpline<Vector3> sL(splineSourceList);
 
        // Loop to create spline vertices
         // Assuming sL is properly initialized and can handle glm::vec3
@@ -156,18 +157,25 @@ namespace Operations {
         for (size_t i = 0; i <  tube_vertices.size(); ++i) {
 
             glm::vec3 v_prev;
-            bool isFirst = true;
+           
             auto tangent=tangents[i];
-            runningSpin+=10.0*2.0*glm::pi<float>()/tube_vertices.size();
+            runningSpin=0;//3.0*2.0*glm::pi<float>()/tube_vertices.size();
 
 
             for (int segment = 0; segment < number_of_segments; ++segment) {
                // float theta = startAngle + (endAngle - startAngle) * float(segment) / float(number_of_segments - 1);
                // float theta = 2.0 * glm::pi<float>() * (static_cast<float>(segment) / static_cast<float>(number_of_segments));
                 float theta =runningSpin + 2.0 * glm::pi<float>()* (static_cast<float>(segment) / static_cast<float>(number_of_segments));
+                glm::vec3 up = glm::vec3(0, 0, 1);
                 glm::vec3 u, v;
                 if (isFirst) {
-                    u = glm::normalize(glm::cross(glm::vec3(1, 1, 1), tangent));
+                    glm::vec3 crossResult = glm::cross(up, tangent);
+                    float croosLenghtRes=glm::length(crossResult);
+                    if (croosLenghtRes< 0.09f) {  // Threshold to detect near-zero cross product
+                        up = glm::vec3(1, 0, 0);  // Choose a different up vector
+                        crossResult = glm::cross(up, tangent);
+                    }
+                    u = glm::normalize(crossResult);
                     isFirst = false;
                 } else {
                     u = glm::normalize(glm::cross(tangent, v_prev));

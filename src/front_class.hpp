@@ -20,6 +20,7 @@ namespace HalfedgeLib {
             HalfedgeDS halfedgeDS01;
 
             void testCube(HalfedgeDS& halfedgeDS);
+            void testNautilus(HalfedgeDS &halfedgeDS);
             void intersectionAABB(HalfedgeDS &halfedgeDS);
             void fillHalfCirclePoints(std::vector<glm::vec3> &sourcePoints, int N, float radius);
             void fillSpiralPoints(std::vector<glm::vec3> &sourcePoints, int N, float initialRadius, float finalRadius, int numberOfLoops);
@@ -29,6 +30,7 @@ namespace HalfedgeLib {
             DrawSupport::GeometryData debugLines;
 
             DrawSupport::GeometryData getTrianglesfromHEDS(HalfedgeDS &halfedgeDS);
+            void triangleSubDivideHEDS(HalfedgeDS &halfedgeDS);
             DrawSupport::GeometryData getDebugLines();
 
             std::vector<Face*> selectedFaces;

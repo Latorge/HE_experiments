@@ -6,18 +6,18 @@ namespace HalfedgeLib {
 
     void FrontClass::testCube(HalfedgeDS& halfedgeDS)
     {
-        //auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
+        auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
         //auto protoCube=Operations::generateQuadArrays(1,1,1.0);
         //auto protoCube=Operations::generateQuadArrays(3,3,1.0);
 
        // auto protoCube=Operations::generateQuadArrays(11,11,1.0);
        // auto protoCube=Operations::generateQuadArraysCube(5,5,5,1.0);
 
-        std::vector<glm::vec3> sourcePoints;
-        int N = 30; // Number of points
-        float radius = 35.0f; // Radius of the half-circle
-        fillHalfCirclePoints(sourcePoints, N, radius);
-        auto protoCube=Operations::generateTube(sourcePoints,7,0,0);
+       // std::vector<glm::vec3> sourcePoints;
+       // int N = 30; // Number of points
+       // float radius = 35.0f; // Radius of the half-circle
+       // fillHalfCirclePoints(sourcePoints, N, radius);
+       // auto protoCube=Operations::generateTube(sourcePoints,7,0,0);
 /*
         for (auto& pos : protoCube.positions) {
             std::cout << "Vertex Coordinates: (" << pos.x << ", " << pos.y << ", " << pos.z << ")" << std::endl;
@@ -41,31 +41,13 @@ namespace HalfedgeLib {
 
         std::cout << "---------------------" << std::endl;
 */
-        //Operations::setFromGeometry(halfedgeDS01,protoCubeUniqVertex.positions, protoCubeUniqVertex.cells);
+        Operations::setFromGeometry(halfedgeDS01,protoCubeUniqVertex.positions, protoCubeUniqVertex.cells);
         //Operations::setFromGeometry(halfedgeDS01,protoCube.positions, protoCube.cells);
 
-    
 
         std::cout<<"HEDS number faces: "<<halfedgeDS01.getFaces().size()<<std::endl;
         std::cout<<"HEDS number vertex: "<<halfedgeDS01.getVertices().size()<<std::endl;
         std::cout<<"HEDS number halfEdges: "<<halfedgeDS01.getHalfedges().size()<<std::endl;
-
-        {
-            HalfedgeDS temphalfedgeDS("temp",2);
-            std::vector<glm::vec3> sourcePoints;
-            int N = 20; // Number of points
-            float radius = 12.0f; // Radius of the half-circle
-            fillSpiralPointsNAU(sourcePoints, N, 1.5,12.5, 5, 2.75);
-            auto protoCube=Operations::generateTubeNL(sourcePoints,0.25,9,0,0);
-
-            //auto protoCube=Operations::generateQuadArraysCube(3,3,3,1.0);
-            auto protoCubeUniqVertex=Operations::computeUniquePositionsArray(protoCube.positions,protoCube.cells);
-
-            //Operations::setFromGeometry(halfedgeDS01,protoCubeUniqVertex.positions, protoCubeUniqVertex.cells);
-            Operations::setFromGeometry(temphalfedgeDS,protoCube.positions, protoCube.cells);
-
-            halfedgeDS01.mergeFrom(temphalfedgeDS);
-        }
 
 /*
         auto faceExp=halfedgeDS01.getFaces()[33];
@@ -92,6 +74,7 @@ namespace HalfedgeLib {
         //auto faceTemp= halfedgeDS01.getFace(0);
         //Modificators::extrudeFace(halfedgeDS01,faceTemp, 1.1f,0.5f);
         
+        /*
         auto vertexTemp= halfedgeDS01.getVertex(8);
         std::vector<Halfedge*> neighbors = vertexTemp->allHalfedgesInLoop();
         std::cout<<"--------------------"<<std::endl;
@@ -103,6 +86,7 @@ namespace HalfedgeLib {
         std::cout<<"number neibors: "<<neighbors.size()<<std::endl;
         std::cout<<"number neibors: "<<neighbors3.size()<<std::endl;
         std::cout<<"number neibors outgoing: "<<neighbors2.size()<<std::endl;
+        */
 /*
         {   
             HalfedgeDS halfedgeDS02=halfedgeDS01;
@@ -159,6 +143,28 @@ namespace HalfedgeLib {
        // auto v1=Operations::addVertex( halfedgeDS, glm::vec3(0,0,0),true);
        // auto v2=Operations::addVertex( halfedgeDS, glm::vec3(1,0,0),true);
        // auto edge1=Operations::addEdge(halfedgeDS,v1,v2);
+    }
+
+    void FrontClass::testNautilus(HalfedgeDS& halfedgeDS)
+    {
+        std::vector<glm::vec3> sourcePoints;
+        int N = 20; // Number of points
+        float radius = 12.0f; // Radius of the half-circle
+        fillSpiralPointsNAU(sourcePoints, N, 1.5,12.5, 5, 2.75);
+        auto protoCube=Operations::generateTubeNL(sourcePoints,0.25,18,0,0);
+
+        //auto protoCube=Operations::generateQuadArraysCube(3,3,3,1.0);
+        auto protoCubeUniqVertex=Operations::computeUniquePositionsArray(protoCube.positions,protoCube.cells);
+
+        Operations::setFromGeometry(halfedgeDS01,protoCubeUniqVertex.positions, protoCubeUniqVertex.cells);
+        //Operations::setFromGeometry(halfedgeDS01,protoCube.positions, protoCube.cells);
+
+        //halfedgeDS01.mergeFrom(temphalfedgeDS);
+
+        std::cout<<"HEDS number faces: "<<halfedgeDS01.getFaces().size()<<std::endl;
+        std::cout<<"HEDS number vertex: "<<halfedgeDS01.getVertices().size()<<std::endl;
+        std::cout<<"HEDS number halfEdges: "<<halfedgeDS01.getHalfedges().size()<<std::endl;
+
     }
 
     void FrontClass::intersectionAABB(HalfedgeDS& halfedgeDS){
@@ -277,13 +283,17 @@ namespace HalfedgeLib {
         return resultList;
     }
 
+    void FrontClass::triangleSubDivideHEDS(HalfedgeDS& halfedgeDS){
+        Modificators::triangleSubDivideStruct(halfedgeDS);
+    }
+
     DrawSupport::GeometryData FrontClass::getDebugLines(){
         return debugLines;
     }
 
     void FrontClass::quadSubDivideHEDS(HalfedgeDS& halfedgeDS){
-        //Modificators::quadSubDivideStruct(halfedgeDS);
-        intersectionAABB(halfedgeDS);
+        Modificators::quadSubDivideStruct(halfedgeDS);
+        //intersectionAABB(halfedgeDS);
     }
 
 
