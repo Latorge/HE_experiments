@@ -14,10 +14,19 @@
 #include "../Core/Face.hpp"
 #include "../Core/HalfedgeDS.hpp"
 
+#include "../DrawSupport/drawSupport.hpp"
+#include "../Scene/Scene.hpp"
+
+#include <unordered_set>
+
 
 namespace RenderLines {
 
+    std::vector<Face*> updateFrontFaces(HalfedgeDS& structD, Scene::Camera& camera);
 
+    std::unordered_set<Face*> updateFrontFacesSet(HalfedgeDS &structD, Scene::Camera &camera);
+
+    std::vector<DrawSupport::PointInfo> renderSilhouetteLines(HalfedgeDS& halfedgeDS, Scene::Camera& camera);
 
 }
 

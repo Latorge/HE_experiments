@@ -66,9 +66,6 @@ namespace Modificators {
                     // Current and next halfedges to and from the center
                     Halfedge* halfEdgeFromCenter = listHalfEdgesFromCenter[i];
                     Halfedge* halfEdgeToCenter = listHalfEdgesToCenter[nextIndex];
-                    //Halfedge* nextHalfEdgeFromCenter = listHalfEdgesFromCenter[nextIndex];
-
-                    // Original halfedge between the two vertices
                     Halfedge* currentOriginalHalfEdge = originalHalfEdges[i];
 
                     // Setup the next and prev links for a triangular face

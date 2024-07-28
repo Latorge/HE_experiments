@@ -7,6 +7,8 @@
 #include "lib/Modificators/Modificators.hpp"
 #include "lib/Intersection/intersections.hpp"
 #include "lib/DrawSupport/drawSupport.hpp"
+#include "lib/Scene/Scene.hpp"
+#include "lib/RenderLines/RenderLines.hpp"
 #include "lib/Core/HalfedgeDS.hpp"
 
 
@@ -18,6 +20,7 @@ namespace HalfedgeLib {
         public:
             FrontClass(std::string _name, int _id):halfedgeDS01(_name, _id) {}
             HalfedgeDS halfedgeDS01;
+            Scene::Scene scene;
 
             void testCube(HalfedgeDS& halfedgeDS);
             void testNautilus(HalfedgeDS &halfedgeDS);
@@ -26,6 +29,8 @@ namespace HalfedgeLib {
             void fillSpiralPoints(std::vector<glm::vec3> &sourcePoints, int N, float initialRadius, float finalRadius, int numberOfLoops);
             void fillSpiralPointsNAU(std::vector<glm::vec3> &sourcePoints, int N, float initialRadius, float finalRadius, int numberOfLoops, float radiusCoeff);
             std::vector<DrawSupport::PointInfo> getLinesfromHEDS(HalfedgeDS &halfedgeDS, bool onlyBoundaryLines, bool drawArrows);
+
+            std::vector<DrawSupport::PointInfo> getSilhouetteLinesfromHEDS(HalfedgeDS &halfedgeDS, Scene::Camera &camera);
 
             DrawSupport::GeometryData debugLines;
 

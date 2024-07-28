@@ -91,10 +91,12 @@ include_directories(${splineLib_DIR})
 
 SET(DrawSupport_INC
     src/lib/DrawSupport/drawSupport.hpp
+    src/lib/Scene/Scene.hpp
 )
 SET(DrawSupport_SRC
     src/lib/DrawSupport/drawHalfEdges.cpp
     src/lib/DrawSupport/triangulateCentralPoint.cpp
+    
 
 )
 
@@ -102,6 +104,8 @@ SET(RenderLines_INC
     src/lib/RenderLines/RenderLines.hpp
 )
 SET(RenderLines_SRC
+    src/lib/RenderLines/renderSilhouetteLines.cpp
+    src/lib/RenderLines/supportRenderLines.cpp
     #src/lib/RenderLines/drawHalfEdges.cpp
     #src/lib/RenderLines/triangulateCentralPoint.cpp
 

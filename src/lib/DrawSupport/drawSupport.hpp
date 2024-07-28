@@ -51,6 +51,11 @@ namespace DrawSupport {
         float blue() const { return color.b; }
         float alpha() const { return color.a; }
 
+        float r() const { return color.r; }
+        float g() const { return color.g; }
+        float b() const { return color.b; }
+        float a() const { return color.a; }
+
         // Direct access to glm::vec4 for operations that benefit from vector operations
         glm::vec4& vec() { return color; }
         const glm::vec4& vec() const { return color; }
@@ -70,6 +75,9 @@ namespace DrawSupport {
     void addTriangleToData(DrawSupport::GeometryData &data, const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3, const glm::vec3 &normal);
     DrawSupport::GeometryData triangulateFace(Face *face);
     DrawSupport::GeometryData processTriangulateHalfedgeDS(HalfedgeDS &halfedgeDS);
+
+
+
 }
 
 #endif // DRAWSUPPORT_HPP

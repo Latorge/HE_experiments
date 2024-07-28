@@ -51,7 +51,8 @@ glm::vec3 Face::calculateCenterPoint() {
 }
 
 bool Face::isFront(const glm::vec3& position) {
-    glm::vec3 viewVector = glm::normalize(position - halfedge->vertex->position);
+    //glm::vec3 viewVector = glm::normalize(position - halfedge->vertex->position);
+    glm::vec3 viewVector = glm::normalize(position - calculateCenterPoint() );
     return glm::dot(viewVector, getNormal()) >= 0;
 }
 

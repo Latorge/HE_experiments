@@ -277,6 +277,14 @@ namespace HalfedgeLib {
         return resultList;
     }
 
+    std::vector<DrawSupport::PointInfo> FrontClass::getSilhouetteLinesfromHEDS(HalfedgeDS& halfedgeDS, Scene::Camera& camera) {
+        std::vector<DrawSupport::PointInfo> resultList;
+        HalfedgeDS triangleHalfedgeDS=halfedgeDS;
+        Modificators::triangleSubDivideStruct(triangleHalfedgeDS);
+        resultList=RenderLines::renderSilhouetteLines(triangleHalfedgeDS, camera);
+        return resultList;
+    }
+
     DrawSupport::GeometryData FrontClass::getTrianglesfromHEDS(HalfedgeDS& halfedgeDS){
         DrawSupport::GeometryData resultList;
         resultList=DrawSupport::processTriangulateHalfedgeDS(halfedgeDS);
