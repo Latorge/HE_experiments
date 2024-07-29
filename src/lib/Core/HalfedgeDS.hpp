@@ -7,6 +7,7 @@
 #include "Vertex.hpp"
 #include "Halfedge.hpp"
 #include "Face.hpp"
+#include <random>
 
 
 
@@ -84,6 +85,8 @@ public:
 
     void copyFrom(const HalfedgeDS& other);
     void mergeFrom(HalfedgeDS &other);
+
+    Face *getRandomFace();
 
 private:
     

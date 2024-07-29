@@ -321,3 +321,15 @@ void HalfedgeDS::mergeFrom( HalfedgeDS& other) {
     }
 }
 
+Face* HalfedgeDS::getRandomFace() {
+        if (faces.empty()) {
+            return nullptr; // Return null if there are no faces
+        }
+
+        std::random_device rd; // Obtain a random number from hardware
+        std::mt19937 eng(rd()); // Seed the generator
+        std::uniform_int_distribution<> distr(0, faces.size() - 1); // Define the range
+
+        return faces[distr(eng)]; // Return a random face
+    }
+

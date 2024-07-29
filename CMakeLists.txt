@@ -105,10 +105,17 @@ SET(DrawSupport_SRC
 
 SET(RenderLines_INC
     src/lib/RenderLines/RenderLines.hpp
+    src/lib/RenderLines/SurfSpriteRender.hpp
 )
 SET(RenderLines_SRC
     src/lib/RenderLines/renderSilhouetteLines.cpp
     src/lib/RenderLines/supportRenderLines.cpp
+
+    src/lib/RenderLines/surfAgent.cpp
+    src/lib/RenderLines/surfRender.cpp
+    src/lib/RenderLines/surfSupportFunctions.cpp
+   
+   
     #src/lib/RenderLines/drawHalfEdges.cpp
     #src/lib/RenderLines/triangulateCentralPoint.cpp
 

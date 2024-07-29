@@ -25,12 +25,12 @@ namespace RenderLines {
     std::vector<Face*> updateFrontFaces(HalfedgeDS& structD, Scene::Camera& camera);
 
     std::unordered_set<Face*> updateFrontFacesSet(HalfedgeDS &structD, Scene::Camera &camera);
-
     std::vector<DrawSupport::PointInfo> renderSilhouetteLines(HalfedgeDS &halfedgeDS, const std::unordered_set<Face *> &frontFaces,
                                                                     const DrawSupport::Color &linesColor, Scene::Camera &camera);
-
     std::vector<DrawSupport::PointInfo> renderSilhouetteLinesWithAngle(HalfedgeDS &halfedgeDS, const std::unordered_set<Face *> &frontFaces,
                                                                     const DrawSupport::Color &linesColor, float angleThresholdDegrees);
+
+    
 }
 
 #endif // RENDERLINES_HPP

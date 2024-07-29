@@ -4,6 +4,19 @@
 
 namespace HalfedgeLib {
 
+    void FrontClass::initSurfRender() {
+
+        surfRender=new RenderLines::SurfRender(&halfedgeDS01,3);
+    }
+
+    std::vector<DrawSupport::PointInfo> FrontClass::step(){
+        std::vector<DrawSupport::PointInfo> resultList;
+
+        surfRender->update(0.01f);
+        resultList=surfRender->collectTrailSegments();
+
+        return resultList;
+    }
 
 
     std::vector<DrawSupport::PointInfo> FrontClass::getLinesfromHEDS(HalfedgeDS& halfedgeDS, bool onlyBoundaryLines, bool drawArrows){

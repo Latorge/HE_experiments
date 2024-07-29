@@ -10,6 +10,7 @@
 #include "lib/Scene/Scene.hpp"
 #include "lib/RenderLines/RenderLines.hpp"
 #include "lib/Core/HalfedgeDS.hpp"
+#include "lib/RenderLines/SurfSpriteRender.hpp"
 
 
 
@@ -22,8 +23,11 @@ namespace HalfedgeLib {
             HalfedgeDS halfedgeDS01;
             Scene::Scene scene;
 
-            std::vector<DrawSupport::PointInfo> getLinesfromHEDS(HalfedgeDS &halfedgeDS, bool onlyBoundaryLines, bool drawArrows);
+            RenderLines::SurfRender* surfRender;
+            void initSurfRender();
+            std::vector<DrawSupport::PointInfo> step();
 
+            std::vector<DrawSupport::PointInfo> getLinesfromHEDS(HalfedgeDS &halfedgeDS, bool onlyBoundaryLines, bool drawArrows);
             std::vector<DrawSupport::PointInfo> getSilhouetteLinesfromHEDS(HalfedgeDS &halfedgeDS, Scene::Camera &camera);
 
             DrawSupport::GeometryData debugLines;
