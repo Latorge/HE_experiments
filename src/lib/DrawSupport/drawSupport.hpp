@@ -40,6 +40,14 @@ namespace DrawSupport {
             color.a = 1.0f;  // Default to fully opaque unless specified otherwise
         }
 
+         // Sets the color using a hexadecimal value
+        void setRGB(float r, float g, float b, float a) {
+            color.r =r;
+            color.g =g;
+            color.b =b;
+            color.a =a;  // Default to fully opaque unless specified otherwise
+        }
+
         // Optionally, you might want to add a constructor for convenience
         Color(unsigned int hexValue = 0xFFFFFF) { // Default white color
             setHex(hexValue);

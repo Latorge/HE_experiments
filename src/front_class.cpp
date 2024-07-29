@@ -279,9 +279,23 @@ namespace HalfedgeLib {
 
     std::vector<DrawSupport::PointInfo> FrontClass::getSilhouetteLinesfromHEDS(HalfedgeDS& halfedgeDS, Scene::Camera& camera) {
         std::vector<DrawSupport::PointInfo> resultList;
+
+        DrawSupport::Color colorTemp1;
+        colorTemp.setRGB(0.75f,0.75f,0.5f,1.0f);
+
         HalfedgeDS triangleHalfedgeDS=halfedgeDS;
         Modificators::triangleSubDivideStruct(triangleHalfedgeDS);
-        resultList=RenderLines::renderSilhouetteLines(triangleHalfedgeDS, camera);
+        std::unordered_set<Face*> frontFaces = RenderLines::updateFrontFacesSet(triangleHalfedgeDS, camera);
+
+        resultList=RenderLines::renderSilhouetteLines(triangleHalfedgeDS, frontFaces, colorTemp1, camera);
+        DrawSupport::Color colorTemp;
+        colorTemp.setRGB(0.5f,0.75f,0.75f,1.0f);
+        
+        auto resultList2=RenderLines::renderSilhouetteLinesWithAngle(triangleHalfedgeDS,frontFaces,colorTemp, 35);
+
+        // Append resultList2 to resultList
+        resultList.insert(resultList.end(), resultList2.begin(), resultList2.end());
+
         return resultList;
     }
 
