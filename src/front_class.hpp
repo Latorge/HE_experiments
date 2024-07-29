@@ -22,12 +22,6 @@ namespace HalfedgeLib {
             HalfedgeDS halfedgeDS01;
             Scene::Scene scene;
 
-            void testCube(HalfedgeDS& halfedgeDS);
-            void testNautilus(HalfedgeDS &halfedgeDS);
-            void intersectionAABB(HalfedgeDS &halfedgeDS);
-            void fillHalfCirclePoints(std::vector<glm::vec3> &sourcePoints, int N, float radius);
-            void fillSpiralPoints(std::vector<glm::vec3> &sourcePoints, int N, float initialRadius, float finalRadius, int numberOfLoops);
-            void fillSpiralPointsNAU(std::vector<glm::vec3> &sourcePoints, int N, float initialRadius, float finalRadius, int numberOfLoops, float radiusCoeff);
             std::vector<DrawSupport::PointInfo> getLinesfromHEDS(HalfedgeDS &halfedgeDS, bool onlyBoundaryLines, bool drawArrows);
 
             std::vector<DrawSupport::PointInfo> getSilhouetteLinesfromHEDS(HalfedgeDS &halfedgeDS, Scene::Camera &camera);

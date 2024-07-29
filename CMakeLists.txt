@@ -96,6 +96,9 @@ SET(DrawSupport_INC
 SET(DrawSupport_SRC
     src/lib/DrawSupport/drawHalfEdges.cpp
     src/lib/DrawSupport/triangulateCentralPoint.cpp
+    src/lib/Scene/scene.cpp
+    src/lib/Scene/camera.cpp
+    src/lib/Scene/createHalfEdgeDS.cpp
     
 
 )
