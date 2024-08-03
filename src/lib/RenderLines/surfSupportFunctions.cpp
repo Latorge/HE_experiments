@@ -88,10 +88,48 @@ namespace RenderLines {
 
 
 
-    glm::vec3 localToBarycentric(const glm::vec2& localPos) {
-            // Assume localPos maps directly to barycentric coordinates for simplicity
-            return glm::vec3(localPos.x, localPos.y, 1.0f - localPos.x - localPos.y);
-        }
+    glm::vec3 localToBarycentric(const glm::vec2& localPos, Face* face) {
+        // Get the vertices of the face
+        auto vertices = face->getVertices();
+        glm::vec3 v0 = vertices[0]->position;
+        glm::vec3 v1 = vertices[1]->position;
+        glm::vec3 v2 = vertices[2]->position;
+
+        glm::vec3 v0v1 = v1 - v0;
+        glm::vec3 v0v2 = v2 - v0;
+        glm::vec3 p = glm::vec3(localPos.x, localPos.y, 0.0f) - v0;
+
+        float d00 = glm::dot(v0v1, v0v1);
+        float d01 = glm::dot(v0v1, v0v2);
+        float d11 = glm::dot(v0v2, v0v2);
+        float d20 = glm::dot(p, v0v1);
+        float d21 = glm::dot(p, v0v2);
+        float denom = d00 * d11 - d01 * d01;
+
+        float v = (d11 * d20 - d01 * d21) / denom;
+        float w = (d00 * d21 - d01 * d20) / denom;
+        float u = 1.0f - v - w;
+
+        return glm::vec3(u, v, w);
+    }
+
+    void transferVelocityUsingBarycentric(glm::vec2& velocity2D, Face* oldFace, Face* newFace, glm::vec2& localPosition) {
+        glm::vec3 barycentric = localToBarycentric(localPosition, oldFace);
+
+        // Assuming new face vertices and calculating new local position
+        auto newVertices = newFace->getVertices();
+        glm::vec3 newPos3D = newVertices[0]->position * barycentric.x + 
+                             newVertices[1]->position * barycentric.y + 
+                             newVertices[2]->position * barycentric.z;
+
+        glm::vec2 newPosition2D = projectTo2D(newPos3D, newFace);
+        glm::vec2 newVelocityPosition2D = projectTo2D(newPos3D + glm::vec3(velocity2D, 0.0), newFace);
+
+        // Update the velocity based on the new positions
+        velocity2D = newVelocityPosition2D - newPosition2D;
+    }
+
+
 
     bool crossesEdge(const glm::vec2& startPos, const glm::vec2& endPos, const glm::vec2& edgeStart, const glm::vec2& edgeEnd) {
 
@@ -253,17 +291,16 @@ namespace RenderLines {
         float lengthSq = glm::length2(axis);
 
         if (lengthSq < 1e-9) {
-            // Normals are nearly parallel
             return glm::quat(1.0, 0.0, 0.0, 0.0); // Return identity quaternion
         }
 
         // Normalize the axis
         axis = glm::normalize(axis);
-        float angle = acos(glm::clamp(glm::dot(fromNormal, toNormal), -1.0f, 1.0f));
-
-        // Create a quaternion representing the rotation
+       // float angle = acos(glm::clamp(glm::dot(fromNormal, toNormal), -1.0f, 1.0f));
+        float angle = glm::angle(fromNormal, toNormal);
         return glm::angleAxis(angle, axis);
     }
+
 
     glm::quat calculateRotationBetweenFaces(Face* fromFace, Face* toFace) {
         glm::vec3 fromNormal = glm::normalize(glm::cross(fromFace->getVertices()[1]->position - fromFace->getVertices()[0]->position, fromFace->getVertices()[2]->position - fromFace->getVertices()[0]->position));
@@ -279,27 +316,76 @@ namespace RenderLines {
         return glm::angleAxis(angle, axis);
     }
 
-    float calculateVelocityAngle(const glm::vec2& velocity, Face* face) {
-        glm::vec3 edge1 = face->getVertices()[1]->position - face->getVertices()[0]->position;
+    float calculateVelocityAngle(const glm::vec2& velocity, Halfedge* edge) {
+        glm::vec3 edge1 = edge->vertex->position-edge->twin->vertex->position;
         glm::vec3 localX = glm::normalize(edge1); // Local x-axis
         glm::vec2 localVelocity = glm::vec2(glm::dot(velocity, glm::vec2(localX.x, localX.y)), glm::dot(velocity, glm::vec2(-localX.y, localX.x)));
 
         return atan2(localVelocity.y, localVelocity.x);
     }
 
-    glm::vec2 constructVelocityFromAngle(float angle, float magnitude, Face* face) {
-        glm::vec3 edge1 = face->getVertices()[1]->position - face->getVertices()[0]->position;
+    glm::vec2 constructVelocityFromAngle(float angle, float magnitude, Face* face, Halfedge* edge) {
+        glm::vec3 edge1 =   edge->vertex->position-edge->twin->vertex->position;
         glm::vec3 localX = glm::normalize(edge1); // Local x-axis
         glm::vec3 localY = glm::normalize(glm::cross(glm::cross(edge1, face->getVertices()[2]->position - face->getVertices()[0]->position), edge1)); // Local y-axis orthogonal to x
 
         glm::vec2 newVelocity = glm::vec2(cos(angle), sin(angle)) * magnitude; // Velocity vector in local face coordinates
-        return newVelocity;//glm::vec2(glm::dot(newVelocity, glm::vec2(localX.x, localX.y)), glm::dot(newVelocity, glm::vec2(localY.x, localY.y)));
+        return glm::vec2(glm::dot(newVelocity, glm::vec2(localX.x, localX.y)), glm::dot(newVelocity, glm::vec2(localY.x, localY.y)));
     }
 
+    glm::vec3 calculate3DVelocity(const glm::vec2& velocity2D, const glm::vec2& position2D, Face* face) {
+        glm::vec3 point3D = projectTo3D(position2D, face); // Project the current 2D position to 3D
+        glm::vec3 point3DWithVelocity = projectTo3D(position2D + velocity2D, face); // Project the 2D position plus velocity to 3D
 
+        return point3DWithVelocity - point3D; // The 3D velocity vector
+    }
 
+    glm::vec3 rotateVector(const glm::vec3& vec, const glm::vec3& axis, float angle) {
+        // Create a rotation matrix around the axis by the given angle
+        glm::mat4 rotMat = glm::rotate(glm::mat4(1.0f), glm::radians(angle), axis);
 
+        // Transform the vector by the rotation matrix
+        glm::vec4 rotatedVec = rotMat * glm::vec4(vec, 1.0f);
 
+        // Convert back to vec3 and return
+        return glm::vec3(rotatedVec);
+    }
+
+    float angleBetweenFaces(Face* face1, Face* face2) {
+        // Assume Face class has a method getNormal() that returns glm::vec3
+        glm::vec3 normal1 = glm::normalize(face1->getNormal());  // Normalize to be safe
+        glm::vec3 normal2 = glm::normalize(face2->getNormal());
+
+        glm::vec3 axis = glm::cross(normal1, normal2);
+        if (glm::length2(axis) < 1e-9) {
+            return 0.0f; // Faces are parallel
+        }
+
+        // Calculate the angle between the normals
+        float angleRadians = glm::angle(normal1, normal2);
+
+        // Convert radians to degrees
+        float angleDegrees = glm::degrees(angleRadians);
+
+        return angleDegrees;
+    }
+
+    bool isApproachingVertex(const glm::vec2& pos, Face* face) {
+        glm::vec3 pos3D = projectTo3D(pos, face);
+        for (auto& v : face->getVertices()) {
+            if (glm::distance(pos3D, v->position) < 0.01) {  // Threshold depends on model scale
+                return true;
+            }
+        }
+        return false;
+    }
+
+    glm::vec3 safeNormalize(const glm::vec3& v) {
+        float len = glm::length(v);
+        if (len < 1e-5)  // Adjust threshold based on expected vector magnitudes in your application
+            return glm::vec3(1, 0, 0); // Return a default normal if too small
+        return v / len;
+    }
 
 
 }

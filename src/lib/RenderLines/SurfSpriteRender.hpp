@@ -61,6 +61,10 @@ namespace RenderLines {
     bool crossesEdge(const glm::vec3& startPos, const glm::vec3& endPos, Halfedge* edge);
     bool crossesEdge(const glm::vec2& startPos, const glm::vec2& endPos, const glm::vec2& edgeStart, const glm::vec2& edgeEnd);
 
+    glm::vec3 localToBarycentric(const glm::vec2 &localPos, Face *face);
+
+    void transferVelocityUsingBarycentric(glm::vec2 &velocity2D, Face *oldFace, Face *newFace, glm::vec2 &localPosition);
+
     float timeToIntersectEdge(const glm::vec3& startPos, const glm::vec3& endPos, Halfedge* edge);
     float timeToIntersectEdge(const glm::vec2 &startPos, const glm::vec2 &endPos, const glm::vec2 &edgeStart, const glm::vec2 &edgeEnd);
     void adjustVelocityDirection(glm::vec3 &velocity, const glm::vec3 &currentNormal, const glm::vec3 &nextNormal);
@@ -75,11 +79,18 @@ namespace RenderLines {
 
     glm::quat calculateRotationBetweenFaces(Face *fromFace, Face *toFace);
 
-    float calculateVelocityAngle(const glm::vec2 &velocity, Face *face);
+    float calculateVelocityAngle(const glm::vec2 &velocity, Halfedge* edge);
+    glm::vec2 constructVelocityFromAngle(float angle, float magnitude, Face *face, Halfedge* edge);
 
-    glm::vec2 constructVelocityFromAngle(float angle, float magnitude, Face *face);
+    glm::vec3 calculate3DVelocity(const glm::vec2 &velocity2D, const glm::vec2 &position2D, Face *face);
 
-    glm::vec3 localToBarycentric(const glm::vec2 &localPos);
+    glm::vec3 rotateVector(const glm::vec3 &vec, const glm::vec3 &axis, float angle);
+
+    float angleBetweenFaces(Face *face1, Face *face2);
+
+    bool isApproachingVertex(const glm::vec2 &pos, Face *face);
+
+    glm::vec3 safeNormalize(const glm::vec3 &v);
 
     glm::vec3 convert2DVelocityTo3D(const glm::vec2 &velocity2D, Face *face);
 
@@ -88,7 +99,7 @@ namespace RenderLines {
         SurfAgent(glm::vec3 startPosition,
             Face* startFace,
             glm::vec2 initialVelocity,
-            size_t maxTrailLength = 100);
+            size_t maxTrailLength = 1100);
 
         void initialize2DEdges(Face *face);
        
@@ -99,15 +110,19 @@ namespace RenderLines {
 
         bool pointOnEdge(const glm::vec2 &point, const glm::vec2 &start, const glm::vec2 &end);
 
-        std::tuple<Edge2D, bool, glm::vec2> crossesEdgesRay(const glm::vec2& startPos, const glm::vec2& endPos,float deltaTime);
+        std::tuple<Edge2D, bool, bool, glm::vec2> crossesEdgesRay(const glm::vec2& startPos, const glm::vec2& endPos,float deltaTime);
 
         void update(float deltaTime);
 
-        void adjustVelocityDirection(glm::vec3 &velocity, const glm::vec3 &fromNormal, const glm::vec3 &toNormal);
+        void adjustVelocityDirection3D(glm::vec3 &velocity, const glm::vec3 &fromNormal, const glm::vec3 &toNormal);
 
         void adjustVelocity2DDirection(glm::vec2 &velocity2D, Face *face,const glm::vec3 &fromNormal, Face *face2,const glm::vec3 &toNormal);
 
-        void adjustAgentVelocity(Face *face1, Face *face2, glm::vec2 &velocity2D);
+        void adjustAgentVelocity(Face *face1, Face *face2, Halfedge* edge1, Halfedge* edge2, glm::vec2 &velocity2D);
+
+        void adjustVelocityDirection(glm::vec2 &velocity2D, Face *oldFace, Face *newFace, float deltaTime);
+
+        bool isPositionWithinTriangle(const glm::vec2 &position, Face *face);
 
         void adjustVelocityDirectionNC(glm::vec2 &velocity2D, Face *face, const glm::vec3 &oldNormal, const glm::vec3 &newNormal);
 

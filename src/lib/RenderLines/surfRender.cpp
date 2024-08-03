@@ -15,7 +15,7 @@ namespace RenderLines {
             glm::vec3 startPosition = startFace->calculateCenterPoint(); // Start at the center of the face
             glm::vec2 initialVelocity = circularRand(0.15f); // Random velocity direction
 
-            agents.emplace_back(startPosition, startFace, initialVelocity, 100);
+            agents.emplace_back(startPosition, startFace, initialVelocity, 1000);
         }
     }
 

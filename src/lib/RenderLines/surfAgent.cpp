@@ -97,7 +97,7 @@ namespace RenderLines {
         }
     }
 
-    std::tuple<Edge2D, bool, glm::vec2> SurfAgent::crossesEdgesRay(const glm::vec2& startPos, const glm::vec2& endPos, float deltaTime) {
+    std::tuple<Edge2D, bool, bool, glm::vec2> SurfAgent::crossesEdgesRay(const glm::vec2& startPos, const glm::vec2& endPos, float deltaTime) {
         for (auto& edge : edges2D)
         {
             auto intersection = rayIntersectEdge(startPos, velLocal, edge);
@@ -106,11 +106,15 @@ namespace RenderLines {
                 if(timeToImpact <= deltaTime)
                 {
                     //handleEdgeCrossing(edge, timeToImpact);
-                    return std::make_tuple(edge, true, intersection.point);
+                    return std::make_tuple(edge, true, true, intersection.point);
+                }
+                else{
+
+                    return std::make_tuple(edge, false, true, intersection.point);
                 }
             }
         }
-        return std::make_tuple(Edge2D(), false, glm::vec2());
+        return std::make_tuple(Edge2D(), false, false,glm::vec2());
     }
 
 
@@ -125,14 +129,19 @@ namespace RenderLines {
 
         // Handle multiple face transitions
         while (deltaTime > 0.0f) {
-            auto [crossedEdgeN, crossedN, intersectionPoint2DN]=crossesEdgesRay(posLocal, newPosition2D, deltaTime);
+            auto [crossedEdgeN, crossedEdge, crossedN, intersectionPoint2DN]=crossesEdgesRay(posLocal, newPosition2D, deltaTime);
             if(crossedEdgeN.halfedge)
+                nextFace=crossedEdgeN.halfedge->twin->face;
+            else if (crossedN)
                 nextFace=crossedEdgeN.halfedge->twin->face;
             else
                 nextFace=currentFace->halfedge->twin->face;
+
             //auto [crossedEdge, crossed, intersectionPoint2D] = crossesEdges(posLocal, newPosition2D);
 
-            if (crossedN) {
+            if (crossedEdge) {
+
+                nextFace=crossedEdgeN.halfedge->twin->face;
                 
                 // Calculate the time used to reach the crossing point
                 float timeUsed = glm::length(intersectionPoint2DN - posLocal) / glm::length(segmentVector2D);
@@ -150,18 +159,82 @@ namespace RenderLines {
                     //adjustVelocityDirection(velLocal, currentFace, currentFace->getNormal(), nextFaceTemp->getNormal());
                      // Assuming 'velLocal' is the local velocity vector that needs to be adjusted
                     //adjustVelocity2DDirection(velLocal,  currentFace, currentFace->getNormal(), nextFaceTemp, nextFaceTemp->getNormal());
-                    //adjustAgentVelocity( currentFace, nextFaceTemp, velLocal);
-                    currentFace =nextFaceTemp;
-
-                    // Recalculate new position in 2D for the new face
                     
-                    newPosition2D = projectTo2D(intersectionPoint3D, currentFace);// + segmentVector2D;
-                    velLocal=0.1f*glm::normalize(projectTo2D(currentFace->calculateCenterPoint(), currentFace)-newPosition2D);
-                    segmentVector2D = velLocal * deltaTime+velLocal * 0.003f;
-                    newPosition2D = newPosition2D + segmentVector2D;
+                    //adjustAgentVelocity( currentFace, nextFaceTemp, crossedEdgeN.halfedge, crossedEdgeN.halfedge->twin, velLocal);
+                   // adjustVelocityDirection(velLocal,currentFace,nextFaceTemp, deltaTime);
+                    //transferVelocityUsingBarycentric(velLocal,currentFace,nextFaceTemp, posLocal);
+
+                 /*   
+                    auto newPosition2D_start = intersectionPoint3D;
+                    auto newPosition2D_end =   projectTo3D(projectTo2D(intersectionPoint3D,currentFace)+velLocal* deltaTime,currentFace);
+
+                    auto axisRatate=  glm::normalize(crossedEdgeN.halfedge->twin->vertex->position-crossedEdgeN.halfedge->vertex->position);
+
+                    auto deltaVector= glm::normalize(newPosition2D_end-newPosition2D_start);
+                    float magnitude = glm::length(velLocal);
+
+                    float angleBetweenFacesDegree=angleBetweenFaces(currentFace, nextFaceTemp);
+                    auto tempVel=rotateVector(deltaVector,axisRatate,angleBetweenFacesDegree);
+
+                    // Check if the faces are coplanar and adjust only if necessary
+                    if (fabs(angleBetweenFacesDegree) < 1e-3) {  // Consider a small threshold instead of exact zero
+                        tempVel = deltaVector;  // Use the original direction if coplanar
+                    }
+
+                    velLocal=glm::normalize(projectTo2D(tempVel,nextFace))*magnitude;
+                
+                    segmentVector2D = velLocal * deltaTime;//+velLocal * 0.003f;
+                    newPosition2D =projectTo2D(intersectionPoint3D,nextFace);
+                    newPosition2D +=segmentVector2D;
                     posLocal = newPosition2D;
 
+                    currentFace =nextFaceTemp;
+
                     initialize2DEdges(currentFace);
+                    */
+
+                    if (isApproachingVertex(posLocal, currentFace)) {
+                    // Adjust movement or rotation logic to handle vertex convergence
+                    // This might involve selecting a different rotation strategy or smoothing the transition
+                        posLocal+=glm::vec2(0.01,0.01);
+
+                    }
+
+                    auto newPosition2D_start = intersectionPoint3D;
+                    auto newPosition2D_end =projectTo3D(projectTo2D(intersectionPoint3D, currentFace) + velLocal*1.0f, currentFace);
+
+                    auto axisRotate =  safeNormalize(crossedEdgeN.halfedge->twin->vertex->position - crossedEdgeN.halfedge->vertex->position);
+                    auto deltaVector = safeNormalize(newPosition2D_end - newPosition2D_start);
+                  // auto deltaVector = safeNormalize(newPosition2D_start - newPosition2D_end);
+                    float magnitude = glm::length(velLocal);
+
+                    float angleBetweenFacesDegree = angleBetweenFaces(currentFace, nextFaceTemp);
+                    glm::quat rotation = glm::angleAxis(glm::radians(angleBetweenFacesDegree), axisRotate);
+                    glm::vec3 tempVel = rotation * deltaVector;
+
+                    velLocal = glm::normalize(projectTo2D(tempVel, nextFaceTemp)) * magnitude;
+
+                    segmentVector2D = velLocal * deltaTime; // Updated velocity for movement in new face
+                    newPosition2D = projectTo2D(intersectionPoint3D, nextFaceTemp);
+                    newPosition2D += segmentVector2D;
+                    posLocal = newPosition2D;
+
+                    if(!isPositionWithinTriangle(posLocal, nextFace))
+                    {
+                        velLocal=glm::normalize(projectTo2D(currentFace->calculateCenterPoint(), currentFace)-newPosition2D)*magnitude;
+                        segmentVector2D = velLocal * deltaTime; // Updated velocity for movement in new face
+                        newPosition2D = projectTo2D(intersectionPoint3D, nextFaceTemp);
+                        newPosition2D += segmentVector2D;
+                        posLocal = newPosition2D;
+                    }
+
+                    currentFace = nextFaceTemp;
+
+                    initialize2DEdges(currentFace);
+
+                 
+
+                     //velLocal=glm::normalize(projectTo2D(currentFace->calculateCenterPoint(), currentFace)-newPosition2D)*magnitude;
 
 
                 } else {
@@ -195,7 +268,7 @@ namespace RenderLines {
 
 
 
-    void SurfAgent::adjustVelocityDirection(glm::vec3& velocity, const glm::vec3& fromNormal, const glm::vec3& toNormal) {
+    void SurfAgent::adjustVelocityDirection3D(glm::vec3& velocity, const glm::vec3& fromNormal, const glm::vec3& toNormal) {
         
         glm::quat rotation = rotationBetweenTriangles(fromNormal, toNormal);
         velocity = rotation * velocity; // Apply the rotation to the velocity vector
@@ -214,12 +287,43 @@ namespace RenderLines {
         velocity2D=projectTo2D(velocity3D,face2);
     }
 
-    void SurfAgent::adjustAgentVelocity(Face* face1, Face* face2, glm::vec2& velocity2D) {
+    void SurfAgent::adjustAgentVelocity(Face* face1, Face* face2, Halfedge* edge1, Halfedge* edge2, glm::vec2& velocity2D) {
         float magnitude = glm::length(velocity2D);
-        float angle = calculateVelocityAngle(velocity2D, face1);
+        float angle = calculateVelocityAngle(velocity2D, edge1);
 
-        velocity2D =constructVelocityFromAngle(angle, magnitude, face2);
-}
+        velocity2D =constructVelocityFromAngle(angle, magnitude, face2, edge2);
+    }
+
+    void SurfAgent::adjustVelocityDirection(glm::vec2& velocity2D, Face* oldFace, Face* newFace, float deltaTime) {
+
+
+        float magnitude = glm::length(velocity2D);
+        glm::vec3 velocity3D = projectTo3D(velocity2D, oldFace);
+        glm::quat rotation = rotationBetweenTriangles(oldFace->getNormal(), newFace->getNormal());
+
+        //glm::vec3 velocity3D = calculate3DVelocity(velocity2D, posLocal, oldFace); // Calculate accurate 3D velocity
+        //glm::quat rotation = rotationBetweenTriangles(oldFace->getNormal(), newFace->getNormal());
+
+        velocity3D = rotation * velocity3D;
+        glm::vec2 newVelocity2D = glm::normalize(projectTo2D(velocity3D, newFace))*magnitude;
+
+        velocity2D = newVelocity2D;
+    }
+
+    bool SurfAgent::isPositionWithinTriangle(const glm::vec2& position, Face* face) {
+        // Triangle vertices
+        glm::vec2 v0 = projectTo2D(face->getVertices()[0]->position, face);
+        glm::vec2 v1 = projectTo2D(face->getVertices()[1]->position, face);
+        glm::vec2 v2 = projectTo2D(face->getVertices()[2]->position, face);
+
+        // Using barycentric coordinates to determine if the point is within the triangle
+        float alpha = ((v1.y - v2.y) * (position.x - v2.x) + (v2.x - v1.x) * (position.y - v2.y)) / ((v1.y - v2.y) * (v0.x - v2.x) + (v2.x - v1.x) * (v0.y - v2.y));
+        float beta = ((v2.y - v0.y) * (position.x - v2.x) + (v0.x - v2.x) * (position.y - v2.y)) / ((v1.y - v2.y) * (v0.x - v2.x) + (v2.x - v1.x) * (v0.y - v2.y));
+        float gamma = 1.0f - alpha - beta;
+
+        return alpha >= 0 && beta >= 0 && gamma >= 0;
+    }
+
 
     void SurfAgent::adjustVelocityDirectionNC(glm::vec2& velocity2D, Face* face, const glm::vec3& oldNormal, const glm::vec3& newNormal) {
         if (glm::length(oldNormal - newNormal) < 1e-8) {
