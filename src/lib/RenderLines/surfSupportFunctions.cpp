@@ -15,7 +15,7 @@ namespace RenderLines {
 
         return {tangent, bitangent};
     }
-
+/*
     glm::vec2 projectTo2D(const glm::vec3& pos3D, Face* currentFace) {
         ProjectionAxes axes = getProjectionAxes(currentFace);
         glm::vec3 origin = currentFace->getVertices()[0]->position;
@@ -24,6 +24,29 @@ namespace RenderLines {
         float x = glm::dot(relPos, axes.tangent);
         float y = glm::dot(relPos, axes.bitangent);
         
+        return glm::vec2(x, y);
+    }
+*/
+    glm::vec2 projectTo2D(const glm::vec3& pos3D, Face* currentFace) {
+        auto vertices = currentFace->getVertices();
+        if (vertices.size() < 3) {
+            // Not enough vertices to define a plane
+            return glm::vec2(0.0f, 0.0f);
+        }
+
+        glm::vec3 origin = vertices[0]->position;
+        glm::vec3 edge1 = vertices[1]->position - origin;
+        glm::vec3 edge2 = vertices[2]->position - origin;
+
+        glm::vec3 localX = glm::normalize(edge1);
+        glm::vec3 planeNormal = glm::normalize(glm::cross(edge1, edge2));
+        glm::vec3 localY = glm::normalize(glm::cross(planeNormal, localX));
+
+        glm::vec3 relPos = pos3D - origin;
+        float x = glm::dot(relPos, localX);
+        float y = glm::dot(relPos, localY);
+
+
         return glm::vec2(x, y);
     }
 
@@ -48,6 +71,19 @@ namespace RenderLines {
         glm::vec3 pos3D = origin + localX * pos2D.x + localY * pos2D.y;
 
         return pos3D;
+    }
+
+    glm::vec3 convert2DVelocityTo3D(const glm::vec2& velocity2D, Face* face) {
+        auto vertices = face->getVertices();
+        glm::vec3 origin = vertices[0]->position;
+        glm::vec3 edge1 = vertices[1]->position - origin;
+        glm::vec3 edge2 = vertices[2]->position - origin;
+
+        glm::vec3 localX = glm::normalize(edge1);
+        glm::vec3 planeNormal = glm::normalize(glm::cross(edge1, edge2));
+        glm::vec3 localY = glm::normalize(glm::cross(planeNormal, localX));
+
+        return localX * velocity2D.x + localY * velocity2D.y;
     }
 
 
@@ -211,6 +247,57 @@ namespace RenderLines {
     glm::vec3 calculateNormal(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3) {
         return glm::normalize(glm::cross(v2 - v1, v3 - v1));
     }
+
+    glm::quat rotationBetweenTriangles(const glm::vec3& fromNormal, const glm::vec3& toNormal) {
+        glm::vec3 axis = glm::cross(fromNormal, toNormal);
+        float lengthSq = glm::length2(axis);
+
+        if (lengthSq < 1e-9) {
+            // Normals are nearly parallel
+            return glm::quat(1.0, 0.0, 0.0, 0.0); // Return identity quaternion
+        }
+
+        // Normalize the axis
+        axis = glm::normalize(axis);
+        float angle = acos(glm::clamp(glm::dot(fromNormal, toNormal), -1.0f, 1.0f));
+
+        // Create a quaternion representing the rotation
+        return glm::angleAxis(angle, axis);
+    }
+
+    glm::quat calculateRotationBetweenFaces(Face* fromFace, Face* toFace) {
+        glm::vec3 fromNormal = glm::normalize(glm::cross(fromFace->getVertices()[1]->position - fromFace->getVertices()[0]->position, fromFace->getVertices()[2]->position - fromFace->getVertices()[0]->position));
+        glm::vec3 toNormal = glm::normalize(glm::cross(toFace->getVertices()[1]->position - toFace->getVertices()[0]->position, toFace->getVertices()[2]->position - toFace->getVertices()[0]->position));
+
+        glm::vec3 axis = glm::cross(fromNormal, toNormal);
+        if (glm::length2(axis) < 1e-9) {
+            return glm::quat(1.0f, 0.0f, 0.0f, 0.0f); // Faces are parallel
+        }
+
+        axis = glm::normalize(axis);
+        float angle = acos(glm::clamp(glm::dot(fromNormal, toNormal), -1.0f, 1.0f));
+        return glm::angleAxis(angle, axis);
+    }
+
+    float calculateVelocityAngle(const glm::vec2& velocity, Face* face) {
+        glm::vec3 edge1 = face->getVertices()[1]->position - face->getVertices()[0]->position;
+        glm::vec3 localX = glm::normalize(edge1); // Local x-axis
+        glm::vec2 localVelocity = glm::vec2(glm::dot(velocity, glm::vec2(localX.x, localX.y)), glm::dot(velocity, glm::vec2(-localX.y, localX.x)));
+
+        return atan2(localVelocity.y, localVelocity.x);
+    }
+
+    glm::vec2 constructVelocityFromAngle(float angle, float magnitude, Face* face) {
+        glm::vec3 edge1 = face->getVertices()[1]->position - face->getVertices()[0]->position;
+        glm::vec3 localX = glm::normalize(edge1); // Local x-axis
+        glm::vec3 localY = glm::normalize(glm::cross(glm::cross(edge1, face->getVertices()[2]->position - face->getVertices()[0]->position), edge1)); // Local y-axis orthogonal to x
+
+        glm::vec2 newVelocity = glm::vec2(cos(angle), sin(angle)) * magnitude; // Velocity vector in local face coordinates
+        return newVelocity;//glm::vec2(glm::dot(newVelocity, glm::vec2(localX.x, localX.y)), glm::dot(newVelocity, glm::vec2(localY.x, localY.y)));
+    }
+
+
+
 
 
 

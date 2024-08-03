@@ -12,6 +12,9 @@
 #include <glm/gtx/intersect.hpp>
 #include <glm/gtx/vector_angle.hpp>
 #include <glm/gtx/range.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/norm.hpp> // For length2 function
+#include <glm/gtx/rotate_vector.hpp> // For rotate functions
 #include <cmath>
 
 #include "../DrawSupport/drawSupport.hpp"
@@ -68,7 +71,17 @@ namespace RenderLines {
 
     glm::vec3 calculateNormal(const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3);
 
+    glm::quat rotationBetweenTriangles(const glm::vec3 &fromNormal, const glm::vec3 &toNormal);
+
+    glm::quat calculateRotationBetweenFaces(Face *fromFace, Face *toFace);
+
+    float calculateVelocityAngle(const glm::vec2 &velocity, Face *face);
+
+    glm::vec2 constructVelocityFromAngle(float angle, float magnitude, Face *face);
+
     glm::vec3 localToBarycentric(const glm::vec2 &localPos);
+
+    glm::vec3 convert2DVelocityTo3D(const glm::vec2 &velocity2D, Face *face);
 
     class SurfAgent {
     public:
@@ -86,12 +99,17 @@ namespace RenderLines {
 
         bool pointOnEdge(const glm::vec2 &point, const glm::vec2 &start, const glm::vec2 &end);
 
-        std::tuple<Edge2D, bool, glm::vec2> crossesEdgesRay(const glm::vec2& startPos, const glm::vec2& endPos);
+        std::tuple<Edge2D, bool, glm::vec2> crossesEdgesRay(const glm::vec2& startPos, const glm::vec2& endPos,float deltaTime);
 
         void update(float deltaTime);
 
-        void adjustVelocityDirection(glm::vec2 &velocity2D, Face *face, const glm::vec3 &oldNormal, const glm::vec3 &newNormal);
+        void adjustVelocityDirection(glm::vec3 &velocity, const glm::vec3 &fromNormal, const glm::vec3 &toNormal);
 
+        void adjustVelocity2DDirection(glm::vec2 &velocity2D, Face *face,const glm::vec3 &fromNormal, Face *face2,const glm::vec3 &toNormal);
+
+        void adjustAgentVelocity(Face *face1, Face *face2, glm::vec2 &velocity2D);
+
+        void adjustVelocityDirectionNC(glm::vec2 &velocity2D, Face *face, const glm::vec3 &oldNormal, const glm::vec3 &newNormal);
 
         void handleOpenBoundary3D();
         void handleOpenBoundary(const glm::vec2& edgeStart, const glm::vec2& edgeEnd);
@@ -113,6 +131,7 @@ namespace RenderLines {
         const glm::vec2& getPosition2D() const { return posLocal; }
         const glm::vec3& getBarycentric() const { return barycentric; }
         const std::deque<glm::vec3>& getTrail() const { return trail; }
+        const std::deque<std::pair<glm::vec2, Face*>>& getFaceTrail() const { return trailFace; }
         const size_t getMaxTrailLength() const {return maxTrailLength; }
 
         Face* getCurrentFace() const {return currentFace;}
@@ -132,6 +151,7 @@ namespace RenderLines {
         glm::vec2 velLocal;  // Local 2D velocity on the triangle's plan
 
         std::deque<glm::vec3> trail;
+        std::deque<std::pair<glm::vec2, Face*>> trailFace;
         size_t maxTrailLength;
 
         std::vector<Edge2D> edges2D;

@@ -97,13 +97,13 @@ namespace RenderLines {
         }
     }
 
-    std::tuple<Edge2D, bool, glm::vec2> SurfAgent::crossesEdgesRay(const glm::vec2& startPos, const glm::vec2& endPos) {
+    std::tuple<Edge2D, bool, glm::vec2> SurfAgent::crossesEdgesRay(const glm::vec2& startPos, const glm::vec2& endPos, float deltaTime) {
         for (auto& edge : edges2D)
         {
             auto intersection = rayIntersectEdge(startPos, velLocal, edge);
             if (intersection.intersect) {
-                //float timeToImpact = intersection.distance/ glm::length(velLocal);
-                //if(timeToImpact <= deltaTime)
+                float timeToImpact = intersection.distance/ glm::length(velLocal);
+                if(timeToImpact <= deltaTime)
                 {
                     //handleEdgeCrossing(edge, timeToImpact);
                     return std::make_tuple(edge, true, intersection.point);
@@ -125,42 +125,47 @@ namespace RenderLines {
 
         // Handle multiple face transitions
         while (deltaTime > 0.0f) {
-            auto [crossedEdgeN, crossedN, intersectionPoint2DN]=crossesEdgesRay(posLocal, newPosition2D);
+            auto [crossedEdgeN, crossedN, intersectionPoint2DN]=crossesEdgesRay(posLocal, newPosition2D, deltaTime);
             if(crossedEdgeN.halfedge)
                 nextFace=crossedEdgeN.halfedge->twin->face;
             else
                 nextFace=currentFace->halfedge->twin->face;
-            auto [crossedEdge, crossed, intersectionPoint2D] = crossesEdges(posLocal, newPosition2D);
+            //auto [crossedEdge, crossed, intersectionPoint2D] = crossesEdges(posLocal, newPosition2D);
 
-            if (crossed) {
-                if (lastCrossedEdge && lastCrossedEdge->halfedge == crossedEdge.halfedge) {
-                    break;  // Prevent immediate back-and-forth transition
-                }
+            if (crossedN) {
                 
                 // Calculate the time used to reach the crossing point
-                float timeUsed = glm::length(intersectionPoint2D - posLocal) / glm::length(segmentVector2D);
+                float timeUsed = glm::length(intersectionPoint2DN - posLocal) / glm::length(segmentVector2D);
 
                 // Ensure posLocal is updated before calculating the remaining deltaTime
-                posLocal = intersectionPoint2D;
+                posLocal = intersectionPoint2DN;
                 glm::vec3 intersectionPoint3D = projectTo3D(posLocal, currentFace);
                 trail.push_back(intersectionPoint3D);
+                trailFace.push_back({posLocal,currentFace});
 
                 deltaTime *= (1.0f - timeUsed);  // Adjust deltaTime for the remaining part of the move
 
-                if (crossedEdge.halfedge->twin && crossedEdge.halfedge->twin->face) {
-                    Face* nextFaceTemp = crossedEdge.halfedge->twin->face;
-                    adjustVelocityDirection(velLocal, currentFace, currentFace->getNormal(), nextFaceTemp->getNormal());
+                if (crossedEdgeN.halfedge->twin && crossedEdgeN.halfedge->twin->face) {
+                    Face* nextFaceTemp = crossedEdgeN.halfedge->twin->face;
+                    //adjustVelocityDirection(velLocal, currentFace, currentFace->getNormal(), nextFaceTemp->getNormal());
+                     // Assuming 'velLocal' is the local velocity vector that needs to be adjusted
+                    //adjustVelocity2DDirection(velLocal,  currentFace, currentFace->getNormal(), nextFaceTemp, nextFaceTemp->getNormal());
+                    //adjustAgentVelocity( currentFace, nextFaceTemp, velLocal);
                     currentFace =nextFaceTemp;
 
                     // Recalculate new position in 2D for the new face
-                    segmentVector2D = velLocal * deltaTime;
-                    newPosition2D = projectTo2D(intersectionPoint3D, currentFace) + segmentVector2D;
+                    
+                    newPosition2D = projectTo2D(intersectionPoint3D, currentFace);// + segmentVector2D;
+                    velLocal=0.1f*glm::normalize(projectTo2D(currentFace->calculateCenterPoint(), currentFace)-newPosition2D);
+                    segmentVector2D = velLocal * deltaTime+velLocal * 0.003f;
+                    newPosition2D = newPosition2D + segmentVector2D;
+                    posLocal = newPosition2D;
 
                     initialize2DEdges(currentFace);
-                    lastCrossedEdge = &crossedEdge;
+
 
                 } else {
-                    handleOpenBoundary(crossedEdge.start, crossedEdge.end);
+                    handleOpenBoundary(crossedEdgeN.start, crossedEdgeN.end);
                     break;  // Stop further motion if at an open boundary
                 }
 
@@ -171,6 +176,7 @@ namespace RenderLines {
                 posLocal = newPosition2D;
                 glm::vec3 newPosition3D = projectTo3D(posLocal, currentFace);
                 trail.push_back(newPosition3D);
+                trailFace.push_back({posLocal,currentFace});
                 break;  // No more edges to cross
             }
 
@@ -183,12 +189,39 @@ namespace RenderLines {
         // Ensure the trail does not exceed the maximum length
         if (trail.size() > maxTrailLength) {
             trail.pop_front();  // Remove the oldest element
+            trailFace.pop_front();  // Remove the oldest element
         }
     }
 
 
 
-    void SurfAgent::adjustVelocityDirection(glm::vec2& velocity2D, Face* face, const glm::vec3& oldNormal, const glm::vec3& newNormal) {
+    void SurfAgent::adjustVelocityDirection(glm::vec3& velocity, const glm::vec3& fromNormal, const glm::vec3& toNormal) {
+        
+        glm::quat rotation = rotationBetweenTriangles(fromNormal, toNormal);
+        velocity = rotation * velocity; // Apply the rotation to the velocity vector
+    }
+
+    void SurfAgent::adjustVelocity2DDirection(glm::vec2& velocity2D, Face *face, const glm::vec3& fromNormal,  Face *face2,const glm::vec3& toNormal) {
+        // Extend the 2D velocity vector into 3D by adding a z-component of 0
+        glm::vec3 velocity3D=convert2DVelocityTo3D(velocity2D, face);
+
+        // Get the rotation quaternion
+        glm::quat rotation = rotationBetweenTriangles(fromNormal, toNormal);
+
+        // Rotate the 3D velocity
+        velocity3D = rotation * velocity3D;
+
+        velocity2D=projectTo2D(velocity3D,face2);
+    }
+
+    void SurfAgent::adjustAgentVelocity(Face* face1, Face* face2, glm::vec2& velocity2D) {
+        float magnitude = glm::length(velocity2D);
+        float angle = calculateVelocityAngle(velocity2D, face1);
+
+        velocity2D =constructVelocityFromAngle(angle, magnitude, face2);
+}
+
+    void SurfAgent::adjustVelocityDirectionNC(glm::vec2& velocity2D, Face* face, const glm::vec3& oldNormal, const glm::vec3& newNormal) {
         if (glm::length(oldNormal - newNormal) < 1e-8) {
             // Normals are the same or very close to each other, no adjustment needed
             return;
