@@ -18,7 +18,7 @@ namespace RenderLines {
        // velLocal = projectTo2D(velWorld, currentFace);
     }
 
-
+/*
     void SurfAgent::initialize2DEdges(Face* face) {
         edges2D.clear();
         auto vertices = face->getVertices();
@@ -29,9 +29,25 @@ namespace RenderLines {
             Edge2D edge;
             edge.start = prevVertex3D;
             edge.end =vertex3D;
-            edge.halfedge = vertex->halfedge->prev;
+            edge.halfedge = vertex->halfedge->prev->twin;
             prevVertex3D = vertex3D;
 
+            edges2D.push_back(edge);
+        }
+    }
+*/
+
+    void SurfAgent::initialize2DEdges(Face* face) {
+        edges2D.clear();
+        auto halfEdges = face->getHalfedges();
+        for (auto he : halfEdges) {
+            glm::vec2 vertex3D_1 = projectTo2D(he->vertex->position, face);
+            glm::vec2 vertex3D_2 = projectTo2D(he->twin->vertex->position, face);
+            Edge2D edge;
+            edge.start = vertex3D_1;
+            edge.end =   vertex3D_2;
+            edge.halfedge =he;
+    
             edges2D.push_back(edge);
         }
     }
@@ -111,10 +127,11 @@ namespace RenderLines {
         while (deltaTime > 0.0f) {
             auto [crossedEdgeN, crossedN, intersectionPoint2DN]=crossesEdgesRay(posLocal, newPosition2D);
             if(crossedEdgeN.halfedge)
-                nextFace=crossedEdgeN.halfedge->face;
+                nextFace=crossedEdgeN.halfedge->twin->face;
             else
                 nextFace=currentFace->halfedge->twin->face;
             auto [crossedEdge, crossed, intersectionPoint2D] = crossesEdges(posLocal, newPosition2D);
+
             if (crossed) {
                 if (lastCrossedEdge && lastCrossedEdge->halfedge == crossedEdge.halfedge) {
                     break;  // Prevent immediate back-and-forth transition
