@@ -110,7 +110,10 @@ namespace RenderLines {
         // Handle multiple face transitions
         while (deltaTime > 0.0f) {
             auto [crossedEdgeN, crossedN, intersectionPoint2DN]=crossesEdgesRay(posLocal, newPosition2D);
-            //nextFace=crossedEdgeN.halfedge->face;
+            if(crossedEdgeN.halfedge)
+                nextFace=crossedEdgeN.halfedge->face;
+            else
+                nextFace=currentFace->halfedge->twin->face;
             auto [crossedEdge, crossed, intersectionPoint2D] = crossesEdges(posLocal, newPosition2D);
             if (crossed) {
                 if (lastCrossedEdge && lastCrossedEdge->halfedge == crossedEdge.halfedge) {

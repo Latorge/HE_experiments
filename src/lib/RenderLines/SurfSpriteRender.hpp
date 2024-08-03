@@ -64,6 +64,10 @@ namespace RenderLines {
 
     IntersectionResult rayIntersectEdge(const glm::vec2& startPos, const glm::vec2& velocity, const Edge2D& edge) ;
 
+    glm::vec3 projectPointOntoPlane(const glm::vec3 &point, const glm::vec3 &planeNormal, const glm::vec3 &planePoint);
+
+    glm::vec3 calculateNormal(const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3);
+
     glm::vec3 localToBarycentric(const glm::vec2 &localPos);
 
     class SurfAgent {

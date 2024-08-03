@@ -202,6 +202,16 @@ namespace RenderLines {
         return IntersectionResult{true, intersectionPoint, t};
     }
 
+    glm::vec3 projectPointOntoPlane(const glm::vec3& point, const glm::vec3& planeNormal, const glm::vec3& planePoint) {
+        glm::vec3 v = point - planePoint;
+        float d = glm::dot(v, planeNormal);
+        return point - d * planeNormal;
+    }
+
+    glm::vec3 calculateNormal(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3) {
+        return glm::normalize(glm::cross(v2 - v1, v3 - v1));
+    }
+
 
 
 

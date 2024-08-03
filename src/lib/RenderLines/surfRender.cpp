@@ -98,6 +98,8 @@ namespace RenderLines {
         agentColor.setRGB(0.0f, 1.0f, 0.0f, 1.0f);  
         DrawSupport::Color faceColor;
         faceColor.setRGB(0.5f, 0.5f, 1.0f, 1.0f); // Light blue for faces
+        DrawSupport::Color nextFaceColor;
+        nextFaceColor.setRGB(0.75f, 0.75f, 1.0f, 1.0f); // Light blue for faces
 
         for (auto& agent : agents) {
             // Convert agent position from 2D back to 3D
@@ -105,15 +107,32 @@ namespace RenderLines {
             const auto& trail = agent.getTrail();
             if (trail.empty()) continue;  // Skip if no points in the trail
 
-            glm::vec3 lastPoint = trail.front();  // Start from the first point
-
-            glm::vec3 agentPos3D1= convertTo3D(agent.getPosition2D(), planeZ);
-            glm::vec3 agentPos3D2= convertTo3D(projectTo2D(lastPoint, agent.getCurrentFace()), planeZ);
-            points.push_back({agentPos3D1, glm::vec4(agentColor.r(), agentColor.g(), agentColor.b(), agentColor.a())});
-            points.push_back({agentPos3D2, glm::vec4(agentColor.r(), agentColor.g(), agentColor.b(), agentColor.a())});
-
-            // Also draw the triangle of the current face of the agent
+            // Calculate the centroid of the triangle
             auto vertices = agent.getCurrentFace()->getVertices();
+
+            glm::vec3 lastPoint = trail.front();  // Start from the first point
+            glm::vec3 currentPoint;
+
+            auto it = trail.begin();
+            size_t count = 1; // Start counting from the first point
+
+            // Draw the actual segments from the trail
+            while (it != trail.end()) {
+                currentPoint = *it++;
+                //lines.push_back({lastPoint, glm::vec4(linesColor.r(), linesColor.g(), linesColor.b(), 1.0f)});
+                glm::vec3 agentPos3D1= convertTo3D(projectTo2D(lastPoint, agent.getCurrentFace()), planeZ);
+                glm::vec3 agentPos3D2= convertTo3D(projectTo2D(currentPoint, agent.getCurrentFace()), planeZ);
+                points.push_back({agentPos3D1, glm::vec4(agentColor.r(), agentColor.g(), agentColor.b(), agentColor.a())});
+                points.push_back({agentPos3D2, glm::vec4(agentColor.r(), agentColor.g(), agentColor.b(), agentColor.a())});
+                //lines.push_back({currentPoint, glm::vec4(linesColor.r(), linesColor.g(), linesColor.b(), 1.0f)});
+
+                lastPoint = currentPoint;
+                count++;
+            }
+
+            glm::vec3 normal =agent.getCurrentFace()->getNormal();
+            // Also draw the triangle of the current face of the agent
+            //auto vertices = agent.getCurrentFace()->getVertices();
             glm::vec3 prevVertex3D = convertTo3D(projectTo2D(vertices.back()->position, agent.getCurrentFace()), planeZ);
 
             for (auto& vertex : vertices) {
@@ -124,10 +143,11 @@ namespace RenderLines {
             }
         
         
-       
-            auto pointsCurrentTriangle=drawSmallerTriangle( agent.getCurrentFace(), 0.07f, planeZ, faceColor.vec3());
+            auto pointsCurrentTriangle=drawSmallerTriangle( agent.getCurrentFace(), 0.17f, planeZ, faceColor.vec3());
+            auto pointsNextTriangle=drawSmallerTriangle( agent.getNextFace(), 0.17f, planeZ, nextFaceColor.vec3());
             // Now add the returned points to the main 'points' vector
             points.insert(points.end(), pointsCurrentTriangle.begin(), pointsCurrentTriangle.end());
+            points.insert(points.end(), pointsNextTriangle.begin(), pointsNextTriangle.end());
         }
 
         return points;
