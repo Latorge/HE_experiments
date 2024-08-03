@@ -6,7 +6,9 @@ namespace HalfedgeLib {
 
     void FrontClass::initSurfRender() {
 
-        surfRender=new RenderLines::SurfRender(&halfedgeDS01,3);
+        //HalfedgeDS triangleHalfedgeDS=halfedgeDS;
+        Modificators::triangleSubDivideStruct(halfedgeDS01);
+        surfRender=new RenderLines::SurfRender(&halfedgeDS01,1);
     }
 
     std::vector<DrawSupport::PointInfo> FrontClass::step(){
@@ -14,6 +16,12 @@ namespace HalfedgeLib {
 
         surfRender->update(0.01f);
         resultList=surfRender->collectTrailSegments();
+        
+        std::vector<DrawSupport::PointInfo> resultList2;
+        resultList2=surfRender->drawProjectedAgentsAndFaces(0.1);
+
+        // Append resultList2 to resultList
+        resultList.insert(resultList.end(), resultList2.begin(), resultList2.end());
 
         return resultList;
     }

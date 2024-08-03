@@ -66,6 +66,7 @@ namespace DrawSupport {
 
         // Direct access to glm::vec4 for operations that benefit from vector operations
         glm::vec4& vec() { return color; }
+        glm::vec3 vec3() { return glm::vec3(color.x,color.y,color.z); }
         const glm::vec4& vec() const { return color; }
     };
 
