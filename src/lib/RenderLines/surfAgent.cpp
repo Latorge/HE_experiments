@@ -102,15 +102,12 @@ namespace RenderLines {
 
    void SurfAgent::update(float _deltaTime) {
         deltaTime = _deltaTime;
-        // Convert velocity and position into 2D using currentFace plane projection
-        
-        glm::vec2 segmentVector2D = velLocal * deltaTime;
-        glm::vec2 newPosition2D = posLocal + segmentVector2D;
 
         glm::vec3 constrainedVelocity = projectVelocityOntoPlane(velWorld, currentFace);   
         velWorld=constrainedVelocity;   
         glm::vec3 constrainedPosition = projectPointOntoPlane(posWorld, currentFace);  
         posWorld =  constrainedPosition;
+
         glm::vec3 segmentVector3D = velWorld * deltaTime;
         glm::vec3 newPosition3D = posWorld + segmentVector3D;
 
@@ -121,34 +118,60 @@ namespace RenderLines {
         float dist=glm::length(velWorld*deltaTime);
 
         // Handle multiple face transitions
-        while (dist > 0.0f) {
+        while(deltaTime > 0.0f) {
 
             glm::vec3 target;
             Halfedge* resultHE=tframe.intersectHalfEdge(posWorld,velWorld, target);
 
             float hitDist=glm::length(posWorld-target);
-
             if(!resultHE)
                 break;
 
             nextFace=resultHE->twin->face;
 
+            float timeUsed = hitDist/glm::length(segmentVector3D);
+
+            deltaTime *= (1.0f - timeUsed);  // Adjust deltaTime for the remaining part of the move
+
             if (hitDist < dist) {
 
-                nextFace=resultHE->twin->face;
-                
-                // Calculate the time used to reach the crossing point
-                float timeUsed =0;// glm::length(intersectionPoint2DN - posLocal) / glm::length(segmentVector2D)
-
-               
+                float timeUsed = hitDist / glm::length(segmentVector3D);
 
                 if (timeUsed == 0) {
-                    break;
+                    break;  // Prevent infinite loop in case of a zero distance (very unlikely)
                 }
-            } else {
-                posLocal = newPosition2D;
+
+
+               // Update the position to the intersection point
+                posWorld = target;
+
+                // Rotate the velocity vector if the normal of the next face is different
+                glm::vec3 normalCurrent = currentFace->getNormal();
+                glm::vec3 normalNext = nextFace->getNormal();
+                glm::vec3 axis = glm::cross(normalCurrent, normalNext);
+                if (glm::length(axis) > 1e-6) {  // Check if the normals are not parallel
+                    axis = glm::normalize(axis);
+                    float angle = acos(glm::clamp(glm::dot(normalCurrent, normalNext), -1.0f, 1.0f));
+                    glm::quat rotation = glm::angleAxis(angle, axis);
+                    velWorld = rotation * velWorld;
+                }
+
+                // Update the current face to the next face
+                currentFace = nextFace;
+
+                // Update segmentVector3D for the next movement segment
+                segmentVector3D = velWorld * deltaTime;
+                newPosition3D = posWorld + segmentVector3D;
+
                 posWorld=newPosition3D;
-                //glm::vec3 newPosition3D = projectTo3D(posLocal, currentFace);
+                posLocal=projectTo2D(posWorld,currentFace);
+                trail.push_back(newPosition3D);
+                trailFace.push_back({posLocal,currentFace});
+
+            } else {
+
+                posWorld=newPosition3D;
+                posLocal=projectTo2D(posWorld,currentFace);
                 trail.push_back(newPosition3D);
                 trailFace.push_back({posLocal,currentFace});
                 break;  // No more edges to cross
