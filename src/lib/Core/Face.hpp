@@ -49,6 +49,7 @@ public:
     std::vector<Vertex*> commonVerticesWithVertex(Vertex *vertex);
     bool isNormalCalculated() const;
     void setHalfedges(const std::vector<Halfedge *> &halfEdgeList);
+    std::vector<Face *> getAdjacentFaces();
     // Additional methods would be translated similarly
 };
 

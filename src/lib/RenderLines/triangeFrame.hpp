@@ -98,7 +98,7 @@ namespace RenderLines {
             target = rayOrigin + rayDirection * dist;
             return index;
         }
-
+/*
         Halfedge* intersectHalfEdge(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, glm::vec3& target) {
             float dist = std::numeric_limits<float>::infinity();
             const float EPSILON = 1e-6f;
@@ -113,16 +113,16 @@ namespace RenderLines {
                 glm::vec3 v1 = he->next->vertex->position;  // Using next vertex in the half-edge loop
                 glm::vec3 edgeNormal = glm::normalize(glm::cross(v1 - v0, normal));
 
-                float d = glm::dot(rayOrigin - v0, edgeNormal);
-                if (d > 0) continue;  // Ray does not intersect the plane, or is not directed towards it
+        //        float d = glm::dot(rayOrigin - v0, edgeNormal);
+        //        if (d > 0) continue;  // Ray does not intersect the plane, or is not directed towards it
+//
+        //        float t = -d / glm::dot(rayDirection, edgeNormal);
+        //        if (t >= 0 && t < dist) {
+        //            dist = t;
+        //            intersectedEdge = he;
+        //     }
+                  
 
-                float t = -d / glm::dot(rayDirection, edgeNormal);
-                if (t >= 0 && t < dist) {
-                    dist = t;
-                    intersectedEdge = he;
-                }
-                
-/*
                 float d = glm::dot(rayOrigin - v0, edgeNormal);
 
                 if (fabs(d) < EPSILON) d = 0.0f;  // Adjust d when it's close to zero
@@ -145,7 +145,7 @@ namespace RenderLines {
                         target = intersectionPoint;  // Update the target with the current intersection point
                     }
                 }
-*/
+
             }
 
             if (intersectedEdge) {
@@ -156,6 +156,68 @@ namespace RenderLines {
 
             return intersectedEdge;
         }
+*/
+
+
+        Halfedge* intersectHalfEdge(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, glm::vec3& target, Face* face) {
+            float dist = std::numeric_limits<float>::infinity();
+            const float EPSILON = 1e-6f;
+            const float EPSILON_LENGTH = 1e-4f;
+            Halfedge* intersectedEdge = nullptr;
+
+            std::vector<Halfedge*> halfEdges = face->getHalfedges();
+            glm::vec3 normal = face->getNormal();
+
+            glm::vec3 closestVertex;
+            float minVertexDist = std::numeric_limits<float>::infinity();
+            Halfedge* closestVertexHalfedge = nullptr;
+
+            for (Halfedge* he : halfEdges) {
+                glm::vec3 v0 = he->vertex->position;
+                glm::vec3 v1 = he->next->vertex->position;
+                glm::vec3 edgeNormal = glm::normalize(glm::cross(v1 - v0, normal));
+
+                float d = glm::dot(rayOrigin - v0, edgeNormal);
+                if (fabs(d) < EPSILON) d = 0.0f;
+
+                float t = -d / glm::dot(rayDirection, edgeNormal);
+                if (t >= 0 && t < dist) {
+                    glm::vec3 intersectionPoint = rayOrigin + t * rayDirection;
+                    glm::vec3 edgeVector = v1 - v0;
+                    glm::vec3 toIntersection = intersectionPoint - v0;
+                    
+                    float projLength = glm::dot(toIntersection, glm::normalize(edgeVector));
+                    float edgeLength = glm::length(edgeVector);
+                    
+                    if (projLength >= -EPSILON_LENGTH && projLength <= edgeLength + EPSILON_LENGTH) {
+                        dist = t;
+                        intersectedEdge = he;
+                        target = intersectionPoint;
+                    }
+                }
+
+                // Check distance to the vertex v0
+                float vertexDist = glm::length(rayOrigin + rayDirection * t - v0);
+                if (vertexDist < minVertexDist) {
+                    minVertexDist = vertexDist;
+                    closestVertex = v0;
+                    closestVertexHalfedge = he;
+                }
+            }
+
+            if (intersectedEdge) {
+                target = rayOrigin + rayDirection * dist; // Calculate exact intersection point
+            } else if (minVertexDist < EPSILON_LENGTH) {
+               // std::cout << "Ray ends precisely on a vertex, handling special case." << std::endl;
+               // intersectedEdge = closestVertexHalfedge; // Assign the closest vertex's halfedge
+               // target = closestVertex; // Set the intersection target to the vertex
+            } else {
+               // std::cout << "No cross with HE found" << std::endl;
+            }
+
+            return intersectedEdge;
+        }
+
 
         void copy(const TriangleFrame& source) {
             a = source.a;

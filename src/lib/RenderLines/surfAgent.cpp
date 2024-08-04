@@ -1,4 +1,5 @@
 #include "SurfSpriteRender.hpp"
+#include "surfAgent.hpp"
 
 namespace RenderLines {
 
@@ -103,19 +104,16 @@ namespace RenderLines {
    void SurfAgent::update(float _deltaTime) {
         deltaTime = _deltaTime;
 
-        
-
         // Handle multiple face transitions
         while(deltaTime > 0.0f) {
-
 
             glm::vec3 constrainedVelocity = projectVelocityOntoPlane(velWorld, currentFace);   
             velWorld=constrainedVelocity;   
             glm::vec3 constrainedPosition = projectPointOntoPlane(posWorld, currentFace);  
             posWorld =  constrainedPosition;
-
             glm::vec3 segmentVector3D = velWorld * deltaTime;
             glm::vec3 newPosition3D = posWorld + segmentVector3D;
+            segmentVector3D = projectPointOntoPlane(segmentVector3D, currentFace);  
 
             Edge2D* lastCrossedEdge = nullptr;
 
@@ -124,34 +122,39 @@ namespace RenderLines {
             float dist=glm::length(segmentVector3D);
 
             glm::vec3 target;
-            Halfedge* resultHE=tframe.intersectHalfEdge(posWorld,velWorld, target);
+            Halfedge* resultHE=tframe.intersectHalfEdge(posWorld,velWorld, target, currentFace);
 
             float hitDist=glm::length(posWorld-target);
-            if(!resultHE)
-            {
-                posWorld=currentFace->calculateCenterPoint();
+
+            if(resultHE)
+                prevHE=resultHE;
+/*
+            if (!resultHE && hitDist <1e-6) {
+                resultHE=prevHE;
+                handleVertexInteraction(currentFace, posWorld, velWorld);
+                break;
+            }
+*/
+            if(!resultHE){
+                //posWorld=currentFace->calculateCenterPoint();
+                currentFace=findAndUpdateCurrentFace(posWorld,currentFace);
                 break;
             }
 
             nextFace=resultHE->twin->face;
 
             float timeUsed = hitDist/glm::length(segmentVector3D);
-
             deltaTime *= (1.0f - timeUsed);  // Adjust deltaTime for the remaining part of the move
 
             if (hitDist < dist) {
 
                 float timeUsed = hitDist / glm::length(segmentVector3D);
 
-                if (timeUsed == 0) {
-                    break;  // Prevent infinite loop in case of a zero distance (very unlikely)
-                }
-
                 float fraction = hitDist / dist;
 
-                if (fraction == 0) {
-                    break; // Prevent infinite loop in case of a zero fraction
-                }
+                //if (fraction == 0) {
+                //    break; // Prevent infinite loop in case of a zero fraction
+                //}
 
                 //glm::vec3 intermediatePoint = vectorLerp(posWorld, target, fraction); // Calculate intermediate point
                // posWorld = intermediatePoint; // Update the position to the intermediate point
@@ -159,6 +162,29 @@ namespace RenderLines {
 
                // Update the position to the intersection point
                 posWorld = target;
+
+                if(!nextFace)
+                {
+                    this->needUpdate=true;
+                    // Reflect velWorld over the plane defined by the half-edge normal
+                    glm::vec3 edgeNormal = glm::normalize(glm::cross(resultHE->vertex->position - resultHE->twin->vertex->position, currentFace->getNormal()));
+                    velWorld = velWorld - 2.0f * glm::dot(velWorld, edgeNormal) * edgeNormal;
+                    nextFace=currentFace;
+
+                    glm::vec3 constrainedVelocity = projectVelocityOntoPlane(velWorld, currentFace);   
+                    velWorld=constrainedVelocity; 
+
+                      // Update segmentVector3D for the next movement segment
+                    segmentVector3D = velWorld * deltaTime;
+                    newPosition3D = posWorld+ segmentVector3D;
+
+                    posWorld=newPosition3D;
+                    posLocal=projectTo2D(posWorld,currentFace);
+                    trail.push_back(newPosition3D);
+                    trailFace.push_back({posLocal,currentFace});
+                    
+                    break;
+                }
 
                 // Rotate the velocity vector if the normal of the next face is different
                 glm::vec3 normalCurrent = currentFace->getNormal();
@@ -172,18 +198,27 @@ namespace RenderLines {
                 }
 
                 // Update the current face to the next face
-                currentFace = nextFace;
-
+                
                 // Update segmentVector3D for the next movement segment
+
+                glm::vec3 constrainedVelocity = projectVelocityOntoPlane(velWorld, nextFace);   
+                velWorld=constrainedVelocity; 
                 segmentVector3D = velWorld * deltaTime;
-                newPosition3D = posWorld + segmentVector3D;
+                newPosition3D = posWorld+ segmentVector3D;
 
                 posWorld=newPosition3D;
-                posLocal=projectTo2D(posWorld,currentFace);
+                posLocal=projectTo2D(posWorld,nextFace);
                 trail.push_back(newPosition3D);
-                trailFace.push_back({posLocal,currentFace});
+                trailFace.push_back({posLocal,nextFace});
+
+                currentFace = nextFace; 
 
             } else {
+
+                if(!nextFace)
+                {
+                    nextFace=currentFace;
+                }
 
                 posWorld=newPosition3D;
                 posLocal=projectTo2D(posWorld,currentFace);
@@ -192,8 +227,13 @@ namespace RenderLines {
                 break;  // No more edges to cross
             }
 
+            if (timeUsed == 0) {
+                    break;  // Prevent infinite loop in case of a zero distance (very unlikely)
+            }
+
+
             // Safety break condition to prevent potential infinite loop
-            if (deltaTime < 1e-6f) {
+            if (deltaTime < 1e-9f) {
                 break;
             }
         }
@@ -203,6 +243,16 @@ namespace RenderLines {
             trail.pop_front();  // Remove the oldest element
             trailFace.pop_front();  // Remove the oldest element
         }
+    }
+
+    void SurfAgent::handleVertexInteraction(Face* face, glm::vec3& position, glm::vec3& velocity) {
+        std::vector<glm::vec3> normals;
+        for (auto& he : face->getHalfedges()) {
+            normals.push_back(he->face->getNormal());
+        }
+        glm::vec3 averageNormal = std::accumulate(normals.begin(), normals.end(), glm::vec3(0.0f)) / float(normals.size());
+        //velocity = reflect(velocity, averageNormal);
+        position +=  averageNormal  * 0.001f;  // move slightly off the vertex to avoid sticking
     }
 
 
@@ -506,8 +556,6 @@ namespace RenderLines {
                     currentFace = nextFaceTemp;
 
                     initialize2DEdges(currentFace);
-
-                 
 
                      //velLocal=glm::normalize(projectTo2D(currentFace->calculateCenterPoint(), currentFace)-newPosition2D)*magnitude;
 

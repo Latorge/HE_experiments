@@ -134,7 +134,8 @@ std::vector<Face*> Vertex::commonFacesWithVertex(Vertex* other) {
          // Since the iterator returns a Halfedge reference, get the pointer with the address-of operator
         Halfedge* he = *it;
         // Check if the current halfedge has a face and if the face includes the other vertex
-        if (he->face && he->face->hasVertex(other)) {
+        if (he->face)// && he->face->hasVertex(other)) 
+        {
             commonFaces.push_back(he->face);
         }
     }

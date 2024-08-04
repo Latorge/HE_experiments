@@ -5,11 +5,11 @@ namespace Scene {
 
     void Scene::testCube(HalfedgeDS& halfedgeDS)
     {
-        auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
+        //auto protoCube=Operations::generateQuadArraysCube(1,1,1,1.0);
         //auto protoCube=Operations::generateQuadArrays(1,1,1.0);
         //auto protoCube=Operations::generateQuadArrays(3,3,1.0);
 
-       // auto protoCube=Operations::generateQuadArrays(11,11,1.0);
+        auto protoCube=Operations::generateQuadArrays(15,15,1.0);
        // auto protoCube=Operations::generateQuadArraysCube(5,5,5,1.0);
 
        // std::vector<glm::vec3> sourcePoints;

@@ -425,6 +425,64 @@ namespace RenderLines {
         return v / len;
     }
 
+    bool isPointInFace(const glm::vec3& point, Face* face) {
+        // Ensure there are exactly three vertices for a triangle
+        auto vertices=face->getVertices();
+        if (vertices.size() != 3) {
+            throw std::runtime_error("Face does not have exactly three vertices.");
+        }
+
+        glm::vec3 v0 = vertices[0]->position;
+        glm::vec3 v1 = vertices[1]->position;
+        glm::vec3 v2 = vertices[2]->position;
+
+        // Compute vectors from point to each vertex
+        glm::vec3 v0p = point - v0;
+        glm::vec3 v1p = point - v1;
+        glm::vec3 v2p = point - v2;
+
+        // Compute cross products
+        glm::vec3 cross1 = glm::cross(v1 - v0, v0p);
+        glm::vec3 cross2 = glm::cross(v2 - v1, v1p);
+        glm::vec3 cross3 = glm::cross(v0 - v2, v2p);
+
+        // Check if the cross product vectors are all pointing in the same direction
+        if (glm::dot(cross1, cross2) >= 0 && glm::dot(cross2, cross3) >= 0 && glm::dot(cross1, cross3) >= 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    Face* findAndUpdateCurrentFace(glm::vec3& posWorld, Face* currentFace) {
+        std::vector<Face*> adjacentFaces = currentFace->getAdjacentFaces();
+        Face* nearestFace = nullptr;
+        double minDistance = std::numeric_limits<double>::infinity();
+
+        for (Face* face : adjacentFaces) {
+            if (isPointInFace(posWorld, face)) {
+                // Calculate some form of 'distance' or 'suitability' metric to determine the best face
+                double distance = glm::length(posWorld - face->calculateCenterPoint()); // Example metric
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestFace = face;
+                }
+            }
+        }
+
+        if (nearestFace) {
+            // Update to the nearest face if found
+           // std::cout << "Transitioning to an adjacent face based on the agent's current position." << std::endl;
+            currentFace = nearestFace;
+        } else {
+            //std::cout << "No suitable adjacent face found, using the center of the current face as fallback." << std::endl;
+            posWorld = currentFace->calculateCenterPoint();  // Fallback if no adjacent face is suitable
+        }
+
+        return currentFace;
+    }
+
+
 
 }
 

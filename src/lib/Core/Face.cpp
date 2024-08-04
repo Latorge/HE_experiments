@@ -97,8 +97,8 @@ Vertex*  Face::vertexFromPosition(const glm::vec3& position, float tolerance = 1
 }
 
 bool Face::hasVertex(Vertex* vertex) {
-    for (auto& he : *halfedge) {
-        if (he.vertex == vertex) {
+    for (auto he : getHalfedges()) {
+        if (he->vertex == vertex) {
             return true;
         }
     }
@@ -169,7 +169,7 @@ bool Face::isNormalCalculated() const {
     return normalFlag;
 }
 
- void Face::setHalfedges(const std::vector<Halfedge*>& halfEdgeList) {
+void Face::setHalfedges(const std::vector<Halfedge*>& halfEdgeList) {
         if (halfEdgeList.empty()) return;
 
         halfedge = halfEdgeList.front(); // set the first halfedge in the list as the primary halfedge
@@ -184,6 +184,26 @@ bool Face::isNormalCalculated() const {
             // Additionally, ensure each halfedge points back to this face
             current->face = this;
         }
+}
+
+// Method to get adjacent faces by finding common faces between vertices
+std::vector<Face*> Face::getAdjacentFaces() {
+    std::set<Face*> adjacentFaces;  // Use a set to avoid duplicates
+
+    auto vertices=getVertices();
+    for (size_t i = 0; i < vertices.size(); i++) {
+        Vertex* currentVertex = vertices[i];
+        Vertex* nextVertex = vertices[(i + 1) % vertices.size()];  // Wrap around for the last edge
+
+        std::vector<Face*> common = currentVertex->commonFacesWithVertex(nextVertex);
+        for (Face* f : common) {
+            if (f != this) {  // Only add the face if it's not the current face
+                adjacentFaces.insert(f);
+            }
+        }
+    }
+
+    return std::vector<Face*>(adjacentFaces.begin(), adjacentFaces.end());  // Convert set back to vector
 }
 
 

@@ -87,6 +87,10 @@ namespace RenderLines {
 
     glm::vec3 safeNormalize(const glm::vec3 &v);
 
+    bool isPointInFace(const glm::vec3 &point, Face *face);
+
+    Face *findAndUpdateCurrentFace(glm::vec3 &posWorld, Face *currentFace);
+
     glm::vec3 convert2DVelocityTo3D(const glm::vec2 &velocity2D, Face *face);
 
     

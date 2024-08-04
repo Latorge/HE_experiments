@@ -45,6 +45,8 @@ namespace RenderLines {
 
         void adjustVelocityDirection3D(glm::vec3 &velocity, const glm::vec3 &fromNormal, const glm::vec3 &toNormal);
 
+        void handleVertexInteraction(Face *face, glm::vec3 &position, glm::vec3 &velocity);
+
         void adjustVelocity2DDirection(glm::vec2 &velocity2D, Face *face,const glm::vec3 &fromNormal, Face *face2,const glm::vec3 &toNormal);
 
         void adjustAgentVelocity(Face *face1, Face *face2, Halfedge* edge1, Halfedge* edge2, glm::vec2 &velocity2D);
@@ -86,6 +88,8 @@ namespace RenderLines {
         Face* currentFace=nullptr;
         Face* nextFace=nullptr;
 
+        Halfedge* prevHE=nullptr;
+
         glm::vec3 posWorld;
         glm::vec3 velWorld;
 
@@ -101,6 +105,7 @@ namespace RenderLines {
         std::vector<Edge2D> edges2D;
 
         float deltaTime;
+        bool needUpdate=false;
     };
 
 
