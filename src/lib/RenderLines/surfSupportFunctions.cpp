@@ -1,4 +1,5 @@
 #include "SurfSpriteRender.hpp"
+#include "surfSupportFunctions.hpp"
 
 namespace RenderLines {
 
@@ -281,6 +282,39 @@ namespace RenderLines {
         float d = glm::dot(v, planeNormal);
         return point - d * planeNormal;
     }
+
+    glm::vec3 projectVelocityOntoPlane(const glm::vec3& velWorld, Face* face) {
+        glm::vec3 normal = glm::normalize(face->getNormal());  // Ensure the normal is normalized
+        glm::vec3 velocityProjection = glm::proj(velWorld, normal);  // Project velWorld onto the normal
+
+        return velWorld - velocityProjection;  // Subtract the projection from the original velocity
+    }
+
+    glm::vec3 projectPointOntoPlane(const glm::vec3& point, Face* face) {
+        // Ensure face is valid
+        if (!face) {
+            throw std::invalid_argument("Face pointer is null.");
+        }
+
+        // Retrieve the normal directly from the Face object
+        glm::vec3 normalizedNormal = face->getNormal();
+
+        // Use the first vertex of the face as a point on the plane
+        glm::vec3 planePoint = face->getVertices().front()->position;
+
+        // Vector from point on the plane to the point in space
+        glm::vec3 pointVector = point - planePoint;
+
+        // Project the point vector onto the plane normal
+        glm::vec3 pointProjection = glm::proj(pointVector, normalizedNormal);
+
+        // Subtract the projection from the point to get the closest point on the plane
+        glm::vec3 closestPointOnPlane = point - pointProjection;
+
+        return closestPointOnPlane;
+    }
+
+
 
     glm::vec3 calculateNormal(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3) {
         return glm::normalize(glm::cross(v2 - v1, v3 - v1));

@@ -28,7 +28,8 @@ namespace RenderLines {
         SurfAgent(glm::vec3 startPosition,
             Face* startFace,
             glm::vec2 initialVelocity,
-            size_t maxTrailLength = 1100);
+            size_t maxTrailLength = 100);
+
         void initialize2DEdges(Face *face);
        
         //void update3d(float deltaTime);
@@ -69,8 +70,6 @@ namespace RenderLines {
         glm::vec3 updateBarycentric(Face* face, const glm::vec3& pos);
 
         glm::vec3 globalToBarycentric(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& p) const;
-
-       
 
         const glm::vec3& getPosition3D() const { return posWorld; }
         const glm::vec2& getPosition2D() const { return posLocal; }

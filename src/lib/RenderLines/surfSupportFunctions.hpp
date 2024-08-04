@@ -8,6 +8,7 @@
 #include <random>
 #include <glm/glm.hpp>
 #include <glm/gtx/vector_angle.hpp>
+#include <glm/gtx/projection.hpp> // For glm::proj
 
 #include "../Core/Vertex.hpp"
 #include "../Core/Halfedge.hpp"
@@ -60,6 +61,10 @@ namespace RenderLines {
     IntersectionResult rayIntersectEdge(const glm::vec2& startPos, const glm::vec2& velocity, const Edge2D& edge) ;
 
     glm::vec3 projectPointOntoPlane(const glm::vec3 &point, const glm::vec3 &planeNormal, const glm::vec3 &planePoint);
+
+    glm::vec3 projectVelocityOntoPlane(const glm::vec3 &velWorld, Face *face);
+
+    glm::vec3 projectPointOntoPlane(const glm::vec3 &point, Face *face);
 
     glm::vec3 calculateNormal(const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3);
 

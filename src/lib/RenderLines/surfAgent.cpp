@@ -15,7 +15,7 @@ namespace RenderLines {
     void SurfAgent::updateWorldPosToLocalPos()
     {
         posLocal = projectTo2D(posWorld, currentFace);
-       // velLocal = projectTo2D(velWorld, currentFace);
+        velWorld =  projectTo3D(velLocal, currentFace);
     }
 
 
@@ -107,91 +107,48 @@ namespace RenderLines {
         glm::vec2 segmentVector2D = velLocal * deltaTime;
         glm::vec2 newPosition2D = posLocal + segmentVector2D;
 
+        glm::vec3 constrainedVelocity = projectVelocityOntoPlane(velWorld, currentFace);   
+        velWorld=constrainedVelocity;   
+        glm::vec3 constrainedPosition = projectPointOntoPlane(posWorld, currentFace);  
+        posWorld =  constrainedPosition;
+        glm::vec3 segmentVector3D = velWorld * deltaTime;
+        glm::vec3 newPosition3D = posWorld + segmentVector3D;
+
         Edge2D* lastCrossedEdge = nullptr;
 
         TriangleFrame tframe(currentFace);
 
+        float dist=glm::length(velWorld*deltaTime);
+
         // Handle multiple face transitions
-        while (deltaTime > 0.0f) {
-            auto [crossedEdgeN, crossedEdge, crossedN, intersectionPoint2DN]=crossesEdgesRay(posLocal, newPosition2D, deltaTime);
-            if(crossedEdgeN.halfedge)
-                nextFace=crossedEdgeN.halfedge->twin->face;
-            else if (crossedN)
-                nextFace=crossedEdgeN.halfedge->twin->face;
-            else
-                nextFace=currentFace->halfedge->twin->face;
+        while (dist > 0.0f) {
 
-            //auto [crossedEdge, crossed, intersectionPoint2D] = crossesEdges(posLocal, newPosition2D);
+            glm::vec3 target;
+            Halfedge* resultHE=tframe.intersectHalfEdge(posWorld,velWorld, target);
 
-            if (crossedEdge) {
+            float hitDist=glm::length(posWorld-target);
 
-                nextFace=crossedEdgeN.halfedge->twin->face;
+            if(!resultHE)
+                break;
+
+            nextFace=resultHE->twin->face;
+
+            if (hitDist < dist) {
+
+                nextFace=resultHE->twin->face;
                 
                 // Calculate the time used to reach the crossing point
-                float timeUsed = glm::length(intersectionPoint2DN - posLocal) / glm::length(segmentVector2D);
+                float timeUsed =0;// glm::length(intersectionPoint2DN - posLocal) / glm::length(segmentVector2D)
 
-                // Ensure posLocal is updated before calculating the remaining deltaTime
-                posLocal = intersectionPoint2DN;
-                glm::vec3 intersectionPoint3D = projectTo3D(posLocal, currentFace);
-                trail.push_back(intersectionPoint3D);
-                trailFace.push_back({posLocal,currentFace});
-
-                deltaTime *= (1.0f - timeUsed);  // Adjust deltaTime for the remaining part of the move
-
-                if (crossedEdgeN.halfedge->twin && crossedEdgeN.halfedge->twin->face) {
-                    Face* nextFaceTemp = crossedEdgeN.halfedge->twin->face;
-  
-
-                    if (isApproachingVertex(posLocal, currentFace)) {
-                    // Adjust movement or rotation logic to handle vertex convergence
-                    // This might involve selecting a different rotation strategy or smoothing the transition
-                        posLocal+=glm::vec2(0.01,0.01);
-
-                    }
-
-                    auto newPosition2D_start = intersectionPoint3D;
-                    auto newPosition2D_end =projectTo3D(projectTo2D(intersectionPoint3D, currentFace) + velLocal*1.0f, currentFace);
-
-                    auto axisRotate =  safeNormalize(crossedEdgeN.halfedge->twin->vertex->position - crossedEdgeN.halfedge->vertex->position);
-                    auto deltaVector = safeNormalize(newPosition2D_end - newPosition2D_start);
-                  // auto deltaVector = safeNormalize(newPosition2D_start - newPosition2D_end);
-                    float magnitude = glm::length(velLocal);
-
-                    float angleBetweenFacesDegree = angleBetweenFaces(currentFace, nextFaceTemp);
-                    glm::quat rotation = glm::angleAxis(glm::radians(angleBetweenFacesDegree), axisRotate);
-                    glm::vec3 tempVel = rotation * deltaVector;
-
-                    velLocal = glm::normalize(projectTo2D(tempVel, nextFaceTemp)) * magnitude;
-
-                    segmentVector2D = velLocal * deltaTime; // Updated velocity for movement in new face
-                    newPosition2D = projectTo2D(intersectionPoint3D, nextFaceTemp);
-                    newPosition2D += segmentVector2D;
-                    posLocal = newPosition2D;
-
-                    if(!isPositionWithinTriangle(posLocal, nextFace))
-                    {
-                        velLocal=glm::normalize(projectTo2D(currentFace->calculateCenterPoint(), currentFace)-newPosition2D)*magnitude;
-                        segmentVector2D = velLocal * deltaTime; // Updated velocity for movement in new face
-                        newPosition2D = projectTo2D(intersectionPoint3D, nextFaceTemp);
-                        newPosition2D += segmentVector2D;
-                        posLocal = newPosition2D;
-                    }
-
-                    currentFace = nextFaceTemp;
-
-                    initialize2DEdges(currentFace);
-
-                } else {
-                    handleOpenBoundary(crossedEdgeN.start, crossedEdgeN.end);
-                    break;  // Stop further motion if at an open boundary
-                }
+               
 
                 if (timeUsed == 0) {
                     break;
                 }
             } else {
                 posLocal = newPosition2D;
-                glm::vec3 newPosition3D = projectTo3D(posLocal, currentFace);
+                posWorld=newPosition3D;
+                //glm::vec3 newPosition3D = projectTo3D(posLocal, currentFace);
                 trail.push_back(newPosition3D);
                 trailFace.push_back({posLocal,currentFace});
                 break;  // No more edges to cross

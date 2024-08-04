@@ -8,7 +8,7 @@ namespace HalfedgeLib {
 
         //HalfedgeDS triangleHalfedgeDS=halfedgeDS;
         Modificators::triangleSubDivideStruct(halfedgeDS01);
-        surfRender=new RenderLines::SurfRender(&halfedgeDS01,3);
+        surfRender=new RenderLines::SurfRender(&halfedgeDS01,1);
     }
 
     std::vector<DrawSupport::PointInfo> FrontClass::step(){
