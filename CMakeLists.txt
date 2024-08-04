@@ -104,8 +104,12 @@ SET(DrawSupport_SRC
 )
 
 SET(RenderLines_INC
+    src/lib/RenderLines/surfSupportFunctions.hpp
     src/lib/RenderLines/RenderLines.hpp
+    src/lib/RenderLines/triangeFrame.hpp
+    src/lib/RenderLines/surfAgent.hpp
     src/lib/RenderLines/SurfSpriteRender.hpp
+    
 )
 SET(RenderLines_SRC
     src/lib/RenderLines/renderSilhouetteLines.cpp
