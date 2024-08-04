@@ -101,6 +101,8 @@ namespace RenderLines {
 
         Halfedge* intersectHalfEdge(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, glm::vec3& target) {
             float dist = std::numeric_limits<float>::infinity();
+            const float EPSILON = 1e-6f;
+            const float EPSILON_LENGHT = 1e-4f;
             Halfedge* intersectedEdge = nullptr;
 
             std::vector<Halfedge*> halfEdges = face->getHalfedges();
@@ -119,11 +121,38 @@ namespace RenderLines {
                     dist = t;
                     intersectedEdge = he;
                 }
+                
+/*
+                float d = glm::dot(rayOrigin - v0, edgeNormal);
+
+                if (fabs(d) < EPSILON) d = 0.0f;  // Adjust d when it's close to zero
+
+                float t = -d / glm::dot(rayDirection, edgeNormal);
+                // Check if ray potentially intersects the plane within the bounds of the edge
+                if (t >= 0 && t < dist) {
+                    glm::vec3 intersectionPoint = rayOrigin + float(t)* rayDirection;
+                    glm::vec3 edgeVector = v1 - v0;
+                    glm::vec3 toIntersection = intersectionPoint - v0;
+                    
+                    // Project the intersection point onto the edge vector
+                    float projLength = glm::dot(toIntersection, glm::normalize(edgeVector));
+                    float edgeLength = glm::length(edgeVector);
+                    
+                    // Check if the projected length is within the bounds of the edge vector
+                    if (projLength >=-EPSILON_LENGHT && projLength <= edgeLength+EPSILON_LENGHT) {
+                        dist = t;
+                        intersectedEdge = he;
+                        target = intersectionPoint;  // Update the target with the current intersection point
+                    }
+                }
+*/
             }
 
             if (intersectedEdge) {
                 target = rayOrigin + rayDirection * dist;  // Calculate intersection point
             }
+            if(!intersectedEdge)
+                std::cout<<"no cross with HE found"<<std::endl;
 
             return intersectedEdge;
         }

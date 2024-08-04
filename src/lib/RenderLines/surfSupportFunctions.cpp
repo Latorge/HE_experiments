@@ -314,6 +314,10 @@ namespace RenderLines {
         return closestPointOnPlane;
     }
 
+    glm::vec3 vectorLerp(const glm::vec3& start, const glm::vec3& end, float t) {
+        return start + t * (end - start);
+    }
+
 
 
     glm::vec3 calculateNormal(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3) {

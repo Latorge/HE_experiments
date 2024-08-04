@@ -15,7 +15,7 @@ namespace RenderLines {
     void SurfAgent::updateWorldPosToLocalPos()
     {
         posLocal = projectTo2D(posWorld, currentFace);
-        velWorld =  projectTo3D(velLocal, currentFace);
+        velWorld =  0.3f*projectTo3D(velLocal, currentFace);
     }
 
 
@@ -103,29 +103,35 @@ namespace RenderLines {
    void SurfAgent::update(float _deltaTime) {
         deltaTime = _deltaTime;
 
-        glm::vec3 constrainedVelocity = projectVelocityOntoPlane(velWorld, currentFace);   
-        velWorld=constrainedVelocity;   
-        glm::vec3 constrainedPosition = projectPointOntoPlane(posWorld, currentFace);  
-        posWorld =  constrainedPosition;
-
-        glm::vec3 segmentVector3D = velWorld * deltaTime;
-        glm::vec3 newPosition3D = posWorld + segmentVector3D;
-
-        Edge2D* lastCrossedEdge = nullptr;
-
-        TriangleFrame tframe(currentFace);
-
-        float dist=glm::length(velWorld*deltaTime);
+        
 
         // Handle multiple face transitions
         while(deltaTime > 0.0f) {
+
+
+            glm::vec3 constrainedVelocity = projectVelocityOntoPlane(velWorld, currentFace);   
+            velWorld=constrainedVelocity;   
+            glm::vec3 constrainedPosition = projectPointOntoPlane(posWorld, currentFace);  
+            posWorld =  constrainedPosition;
+
+            glm::vec3 segmentVector3D = velWorld * deltaTime;
+            glm::vec3 newPosition3D = posWorld + segmentVector3D;
+
+            Edge2D* lastCrossedEdge = nullptr;
+
+            TriangleFrame tframe(currentFace);
+
+            float dist=glm::length(segmentVector3D);
 
             glm::vec3 target;
             Halfedge* resultHE=tframe.intersectHalfEdge(posWorld,velWorld, target);
 
             float hitDist=glm::length(posWorld-target);
             if(!resultHE)
+            {
+                posWorld=currentFace->calculateCenterPoint();
                 break;
+            }
 
             nextFace=resultHE->twin->face;
 
@@ -140,6 +146,15 @@ namespace RenderLines {
                 if (timeUsed == 0) {
                     break;  // Prevent infinite loop in case of a zero distance (very unlikely)
                 }
+
+                float fraction = hitDist / dist;
+
+                if (fraction == 0) {
+                    break; // Prevent infinite loop in case of a zero fraction
+                }
+
+                //glm::vec3 intermediatePoint = vectorLerp(posWorld, target, fraction); // Calculate intermediate point
+               // posWorld = intermediatePoint; // Update the position to the intermediate point
 
 
                // Update the position to the intersection point

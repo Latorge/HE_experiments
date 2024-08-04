@@ -66,6 +66,8 @@ namespace RenderLines {
 
     glm::vec3 projectPointOntoPlane(const glm::vec3 &point, Face *face);
 
+    glm::vec3 vectorLerp(const glm::vec3 &start, const glm::vec3 &end, float t);
+
     glm::vec3 calculateNormal(const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3);
 
     glm::quat rotationBetweenTriangles(const glm::vec3 &fromNormal, const glm::vec3 &toNormal);
